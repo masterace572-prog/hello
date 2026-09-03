@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "settings": {
+    "maintenance": false,
+    "maintenanceMessage": "Server is under maintenance. Please try again later.",
+    "licenseSecret": "Vm8Lk7Uj2JmsjCPVPVjrLa7zgfx3uz9E",
+    "downloadUrl": "",
+    "versionUrl": "",
+    "announcements": []
+  },
+  "keys": []
+}
