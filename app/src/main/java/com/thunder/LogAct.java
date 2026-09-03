@@ -66,7 +66,7 @@ public class LogAct extends AppCompatActivity {
     private EditText textUsername;
     private Button btnLogin;
     private ImageView pasteBtn;
-    private TextView getKey;
+    private View getKey;
     private File loaderKeyFile;
     private Dialog loadingDialog;
 
@@ -203,7 +203,9 @@ public class LogAct extends AppCompatActivity {
             checkAndRequestPermissions();
         } else if (requestCode == REQUEST_MANAGE_UNKNOWN_APP_SOURCES) {
             if (canRequestPackageInstalls()) {
-                android.os.Process.killProcess(android.os.Process.myPid());
+                // Re-initialize the activity with the freshly granted permission
+                // instead of killing the process (which looked like a crash).
+                recreate();
             }
         }
     }
