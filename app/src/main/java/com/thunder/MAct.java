@@ -109,7 +109,7 @@ public class MAct extends AppCompatActivity {
             Button launchButton = dialog.findViewById(R.id.optionLaunch);
             Button copyButton = dialog.findViewById(R.id.optionCopyObb);
             Button clearButton = dialog.findViewById(R.id.optionClearLogin);
-            android.widget.TextView closeButton = dialog.findViewById(R.id.optionClose);
+            android.view.View closeButton = dialog.findViewById(R.id.optionClose);
 
             if (launchButton != null) {
                 launchButton.setOnClickListener(v -> {
