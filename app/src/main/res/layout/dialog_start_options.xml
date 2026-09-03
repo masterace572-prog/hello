@@ -3,126 +3,75 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:background="@drawable/loader_card_highlight"
+    android:background="@drawable/loader_card"
     android:padding="22dp">
 
-    <!-- Header -->
-    <LinearLayout
-        android:layout_width="match_parent"
+    <TextView
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_vertical">
+        android:text="Start options"
+        android:fontFamily="@font/bold"
+        android:textSize="18sp"
+        android:includeFontPadding="false"
+        android:textColor="@color/text_primary" />
 
-        <FrameLayout
-            android:layout_width="44dp"
-            android:layout_height="44dp"
-            android:background="@drawable/bg_icon_tile"
-            android:padding="11dp">
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:text="Choose an action"
+        android:fontFamily="@font/font"
+        android:textSize="13sp"
+        android:includeFontPadding="false"
+        android:textColor="@color/text_secondary" />
 
-            <ImageView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:src="@drawable/ic_game"
-                android:tint="@color/primary"
-                android:contentDescription="@null" />
-        </FrameLayout>
-
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_marginStart="14dp"
-            android:orientation="vertical">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Start options"
-                style="@style/AppText.Title"
-                android:textSize="17sp" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="2dp"
-                android:text="Choose an action for your BGMI session"
-                style="@style/AppText.Caption" />
-        </LinearLayout>
-    </LinearLayout>
-
-    <!-- Launch -->
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/optionLaunch"
         android:layout_width="match_parent"
         android:layout_height="52dp"
         android:layout_marginTop="22dp"
         android:text="Launch BGMI"
-        android:drawableStart="@drawable/ic_play"
-        android:drawablePadding="8dp"
-        android:drawableTint="@color/on_accent"
         android:fontFamily="@font/bold"
         android:textSize="14sp"
+        android:includeFontPadding="false"
         android:textColor="@color/on_accent"
         android:background="@drawable/loader_button" />
 
-    <!-- Copy OBB -->
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/optionCopyObb"
         android:layout_width="match_parent"
         android:layout_height="52dp"
         android:layout_marginTop="10dp"
         android:text="Copy OBB file"
-        android:drawableStart="@drawable/ic_download"
-        android:drawablePadding="8dp"
-        android:drawableTint="@color/text_secondary"
         android:fontFamily="@font/bold"
         android:textSize="14sp"
+        android:includeFontPadding="false"
         android:textColor="@color/text_secondary"
         android:background="@drawable/loader_button_outline" />
 
-    <!-- Clear login -->
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/optionClearLogin"
         android:layout_width="match_parent"
         android:layout_height="52dp"
         android:layout_marginTop="10dp"
         android:text="Clear login data"
-        android:drawableStart="@drawable/ic_logout"
-        android:drawablePadding="8dp"
-        android:drawableTint="@color/text_secondary"
         android:fontFamily="@font/bold"
         android:textSize="14sp"
+        android:includeFontPadding="false"
         android:textColor="@color/text_secondary"
         android:background="@drawable/loader_button_outline" />
 
-    <!-- Cancel -->
-    <LinearLayout
+    <TextView
         android:id="@+id/optionClose"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="14dp"
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
-        android:background="@drawable/bg_ghost"
-        android:paddingStart="16dp"
-        android:paddingEnd="16dp"
-        android:paddingTop="10dp"
-        android:paddingBottom="10dp">
-
-        <ImageView
-            android:layout_width="16dp"
-            android:layout_height="16dp"
-            android:src="@drawable/ic_close"
-            android:tint="@color/text_muted"
-            android:contentDescription="@null" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="6dp"
-            android:text="Cancel"
-            style="@style/AppText.Body"
-            android:textColor="@color/text_muted" />
-    </LinearLayout>
+        android:padding="10dp"
+        android:text="Cancel"
+        android:fontFamily="@font/font"
+        android:textSize="13sp"
+        android:includeFontPadding="false"
+        android:textColor="@color/text_muted"
+        android:background="?attr/selectableItemBackground" />
 </LinearLayout>

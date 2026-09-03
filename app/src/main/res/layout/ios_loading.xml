@@ -4,39 +4,34 @@
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:gravity="center"
-    android:padding="28dp"
-    android:background="@drawable/loader_card_highlight">
+    android:background="@drawable/loader_card"
+    android:padding="28dp">
 
-    <FrameLayout
-        android:layout_width="64dp"
-        android:layout_height="64dp"
-        android:background="@drawable/bg_logo_tile"
-        android:padding="5dp">
-
-        <ImageView
-            android:id="@+id/loadingIcon"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:src="@drawable/ic_launcher"
-            android:padding="10dp"
-            android:contentDescription="Loading" />
-    </FrameLayout>
+    <ImageView
+        android:id="@+id/loadingIcon"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:src="@drawable/ic_launcher"
+        android:scaleType="fitCenter"
+        android:contentDescription="Loading" />
 
     <TextView
         android:id="@+id/loadingText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="18dp"
+        android:layout_marginTop="16dp"
         android:text="Logging in..."
-        style="@style/AppText.Title"
-        android:textSize="15sp" />
+        android:fontFamily="@font/bold"
+        android:textSize="15sp"
+        android:includeFontPadding="false"
+        android:textColor="@color/text_primary" />
 
     <ProgressBar
         android:id="@+id/progressBar"
         style="?android:attr/progressBarStyleHorizontal"
-        android:layout_width="190dp"
+        android:layout_width="180dp"
         android:layout_height="6dp"
-        android:layout_marginTop="18dp"
+        android:layout_marginTop="16dp"
         android:indeterminate="true"
         android:progressTint="@color/primary"
         android:indeterminateTint="@color/primary" />
@@ -47,17 +42,20 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
         android:text="Please wait..."
-        style="@style/AppText.Caption"
+        android:fontFamily="@font/font"
+        android:textSize="12sp"
+        android:includeFontPadding="false"
         android:textColor="@color/text_secondary" />
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/okButton"
-        android:layout_width="140dp"
+        android:layout_width="120dp"
         android:layout_height="44dp"
-        android:layout_marginTop="18dp"
+        android:layout_marginTop="16dp"
         android:text="OK"
         android:fontFamily="@font/bold"
         android:textSize="14sp"
+        android:includeFontPadding="false"
         android:textColor="@color/on_accent"
         android:background="@drawable/loader_button"
         android:visibility="gone" />

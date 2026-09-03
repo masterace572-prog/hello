@@ -1,470 +1,313 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/loader_bg">
+    android:background="@drawable/loader_bg"
+    android:fillViewport="true"
+    android:overScrollMode="never"
+    android:scrollbars="none">
 
-    <ScrollView
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:fillViewport="true"
-        android:overScrollMode="never"
-        android:scrollbars="none">
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingStart="24dp"
+        android:paddingEnd="24dp"
+        android:paddingTop="36dp"
+        android:paddingBottom="32dp">
 
+        <!-- Header -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Control Center"
+            android:fontFamily="@font/bold"
+            android:textSize="24sp"
+            android:includeFontPadding="false"
+            android:textColor="@color/text_primary" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:text="Manage your game session"
+            android:fontFamily="@font/font"
+            android:textSize="14sp"
+            android:includeFontPadding="false"
+            android:textColor="@color/text_secondary" />
+
+        <!-- Session card -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="32dp"
             android:orientation="vertical"
-            android:paddingStart="20dp"
-            android:paddingEnd="20dp"
-            android:paddingTop="28dp"
-            android:paddingBottom="32dp">
+            android:background="@drawable/loader_card"
+            android:padding="20dp">
 
-            <!-- Header -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:layout_marginBottom="24dp">
+                android:gravity="center_vertical">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Session"
+                    android:fontFamily="@font/font"
+                    android:textSize="13sp"
+                    android:includeFontPadding="false"
+                    android:textColor="@color/text_secondary" />
+
+                <TextView
+                    android:id="@+id/licenseTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Active"
+                    android:fontFamily="@font/font"
+                    android:textSize="12sp"
+                    android:includeFontPadding="false"
+                    android:textColor="@color/success" />
+            </LinearLayout>
+
+            <!-- Countdown -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:orientation="horizontal"
+                android:gravity="center">
 
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:orientation="vertical">
+                    android:orientation="vertical"
+                    android:gravity="center">
 
                     <TextView
+                        android:id="@+id/tvD"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="VIPER CHEAT"
-                        style="@style/AppText.Overline"
-                        android:textColor="@color/primary"
-                        android:letterSpacing="0.2" />
+                        android:text="00"
+                        android:fontFamily="@font/bold"
+                        android:textSize="24sp"
+                        android:includeFontPadding="false"
+                        android:textColor="@color/text_primary" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
-                        android:text="Control Center"
-                        style="@style/AppText.Headline" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="3dp"
-                        android:text="Manage your game session"
-                        style="@style/AppText.Body"
+                        android:text="Days"
+                        android:fontFamily="@font/font"
+                        android:textSize="11sp"
+                        android:includeFontPadding="false"
                         android:textColor="@color/text_muted" />
                 </LinearLayout>
 
                 <LinearLayout
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:background="@drawable/bg_status_ok"
-                    android:paddingStart="12dp"
-                    android:paddingEnd="12dp"
-                    android:paddingTop="7dp"
-                    android:paddingBottom="7dp">
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:gravity="center">
 
-                    <View
-                        android:layout_width="7dp"
-                        android:layout_height="7dp"
-                        android:background="@drawable/dot_status_ok" />
+                    <TextView
+                        android:id="@+id/tvH"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="00"
+                        android:fontFamily="@font/bold"
+                        android:textSize="24sp"
+                        android:includeFontPadding="false"
+                        android:textColor="@color/text_primary" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="6dp"
-                        android:text="Active"
-                        style="@style/AppText.Overline"
-                        android:textColor="@color/success"
-                        android:letterSpacing="0.1" />
-                </LinearLayout>
-            </LinearLayout>
-
-            <!-- Session card -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@drawable/loader_card_highlight"
-                android:elevation="4dp"
-                android:padding="20dp"
-                android:orientation="vertical">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical">
-
-                    <FrameLayout
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        android:background="@drawable/bg_icon_tile"
-                        android:padding="10dp">
-
-                        <ImageView
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:src="@drawable/ic_timer"
-                            android:tint="@color/primary"
-                            android:contentDescription="@null" />
-                    </FrameLayout>
-
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:layout_marginStart="12dp"
-                        android:orientation="vertical">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Session"
-                            style="@style/AppText.Title" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="2dp"
-                            android:text="Time remaining"
-                            style="@style/AppText.Caption" />
-                    </LinearLayout>
-
-                    <TextView
-                        android:id="@+id/licenseTitle"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="VALID"
-                        style="@style/AppText.Overline"
-                        android:textColor="@color/success"
-                        android:letterSpacing="0.14" />
+                        android:layout_marginTop="4dp"
+                        android:text="Hours"
+                        android:fontFamily="@font/font"
+                        android:textSize="11sp"
+                        android:includeFontPadding="false"
+                        android:textColor="@color/text_muted" />
                 </LinearLayout>
 
                 <LinearLayout
-                    android:layout_width="match_parent"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center"
-                    android:layout_marginTop="20dp">
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:gravity="center">
 
-                    <LinearLayout
-                        android:layout_width="0dp"
+                    <TextView
+                        android:id="@+id/tvM"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical"
-                        android:gravity="center"
-                        android:paddingTop="12dp"
-                        android:paddingBottom="12dp"
-                        android:layout_marginEnd="6dp"
-                        android:background="@drawable/loader_pill">
-
-                        <TextView
-                            android:id="@+id/tvD"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="00"
-                            android:fontFamily="@font/bold"
-                            android:textSize="22sp"
-                            android:includeFontPadding="false"
-                            android:textColor="@color/text_primary" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="DAYS"
-                            style="@style/AppText.Overline"
-                            android:layout_marginTop="4dp"
-                            android:textColor="@color/text_muted"
-                            android:letterSpacing="0.08" />
-                    </LinearLayout>
+                        android:text="00"
+                        android:fontFamily="@font/bold"
+                        android:textSize="24sp"
+                        android:includeFontPadding="false"
+                        android:textColor="@color/text_primary" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text=":"
-                        android:fontFamily="@font/bold"
-                        android:textSize="18sp"
-                        android:textColor="@color/text_muted"
-                        android:layout_marginStart="6dp"
-                        android:layout_marginEnd="6dp" />
+                        android:layout_marginTop="4dp"
+                        android:text="Mins"
+                        android:fontFamily="@font/font"
+                        android:textSize="11sp"
+                        android:includeFontPadding="false"
+                        android:textColor="@color/text_muted" />
+                </LinearLayout>
 
-                    <LinearLayout
-                        android:layout_width="0dp"
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:gravity="center">
+
+                    <TextView
+                        android:id="@+id/tvS"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical"
-                        android:gravity="center"
-                        android:paddingTop="12dp"
-                        android:paddingBottom="12dp"
-                        android:layout_marginStart="6dp"
-                        android:layout_marginEnd="6dp"
-                        android:background="@drawable/loader_pill">
-
-                        <TextView
-                            android:id="@+id/tvH"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="00"
-                            android:fontFamily="@font/bold"
-                            android:textSize="22sp"
-                            android:includeFontPadding="false"
-                            android:textColor="@color/text_primary" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="HOURS"
-                            style="@style/AppText.Overline"
-                            android:layout_marginTop="4dp"
-                            android:textColor="@color/text_muted"
-                            android:letterSpacing="0.08" />
-                    </LinearLayout>
+                        android:text="00"
+                        android:fontFamily="@font/bold"
+                        android:textSize="24sp"
+                        android:includeFontPadding="false"
+                        android:textColor="@color/text_primary" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text=":"
-                        android:fontFamily="@font/bold"
-                        android:textSize="18sp"
-                        android:textColor="@color/text_muted"
-                        android:layout_marginStart="6dp"
-                        android:layout_marginEnd="6dp" />
-
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical"
-                        android:gravity="center"
-                        android:paddingTop="12dp"
-                        android:paddingBottom="12dp"
-                        android:layout_marginStart="6dp"
-                        android:layout_marginEnd="6dp"
-                        android:background="@drawable/loader_pill">
-
-                        <TextView
-                            android:id="@+id/tvM"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="00"
-                            android:fontFamily="@font/bold"
-                            android:textSize="22sp"
-                            android:includeFontPadding="false"
-                            android:textColor="@color/text_primary" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="MINS"
-                            style="@style/AppText.Overline"
-                            android:layout_marginTop="4dp"
-                            android:textColor="@color/text_muted"
-                            android:letterSpacing="0.08" />
-                    </LinearLayout>
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text=":"
-                        android:fontFamily="@font/bold"
-                        android:textSize="18sp"
-                        android:textColor="@color/text_muted"
-                        android:layout_marginStart="6dp"
-                        android:layout_marginEnd="6dp" />
-
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical"
-                        android:gravity="center"
-                        android:paddingTop="12dp"
-                        android:paddingBottom="12dp"
-                        android:layout_marginStart="6dp"
-                        android:background="@drawable/loader_pill">
-
-                        <TextView
-                            android:id="@+id/tvS"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="00"
-                            android:fontFamily="@font/bold"
-                            android:textSize="22sp"
-                            android:includeFontPadding="false"
-                            android:textColor="@color/text_primary" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="SECS"
-                            style="@style/AppText.Overline"
-                            android:layout_marginTop="4dp"
-                            android:textColor="@color/text_muted"
-                            android:letterSpacing="0.08" />
-                    </LinearLayout>
+                        android:layout_marginTop="4dp"
+                        android:text="Secs"
+                        android:fontFamily="@font/font"
+                        android:textSize="11sp"
+                        android:includeFontPadding="false"
+                        android:textColor="@color/text_muted" />
                 </LinearLayout>
             </LinearLayout>
+        </LinearLayout>
 
-            <!-- Progress card -->
-            <LinearLayout
-                android:id="@+id/progressCard"
+        <!-- Progress card -->
+        <LinearLayout
+            android:id="@+id/progressCard"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            android:layout_marginTop="16dp"
+            android:orientation="vertical"
+            android:background="@drawable/loader_card"
+            android:padding="20dp">
+
+            <ProgressBar
+                android:id="@+id/progressBar"
+                style="?android:attr/progressBarStyleHorizontal"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:visibility="gone"
-                android:layout_marginTop="16dp"
-                android:background="@drawable/loader_card"
-                android:padding="20dp"
-                android:orientation="vertical">
+                android:layout_height="8dp"
+                android:max="100"
+                android:indeterminate="false"
+                android:progressDrawable="@drawable/loader_progress" />
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Preparing game"
-                    style="@style/AppText.Title"
-                    android:textSize="14sp" />
-
-                <ProgressBar
-                    android:id="@+id/progressBar"
-                    style="?android:attr/progressBarStyleHorizontal"
-                    android:layout_width="match_parent"
-                    android:layout_height="8dp"
-                    android:layout_marginTop="14dp"
-                    android:max="100"
-                    android:indeterminate="false"
-                    android:progressDrawable="@drawable/loader_progress" />
-
-                <TextView
-                    android:id="@+id/progressText"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:text="Preparing..."
-                    style="@style/AppText.Caption"
-                    android:textColor="@color/text_secondary" />
-            </LinearLayout>
-
-            <!-- Game module -->
             <TextView
+                android:id="@+id/progressText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="26dp"
-                android:layout_marginBottom="10dp"
-                android:text="GAME MODULE"
-                style="@style/AppText.Overline"
-                android:textColor="@color/text_muted" />
+                android:layout_marginTop="10dp"
+                android:text="Preparing..."
+                android:fontFamily="@font/font"
+                android:textSize="13sp"
+                android:includeFontPadding="false"
+                android:textColor="@color/text_secondary" />
+        </LinearLayout>
+
+        <!-- Game card -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:orientation="vertical"
+            android:background="@drawable/loader_card"
+            android:padding="20dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@drawable/loader_card"
-                android:elevation="3dp"
-                android:padding="18dp"
-                android:orientation="vertical">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal">
-
-                    <FrameLayout
-                        android:layout_width="56dp"
-                        android:layout_height="56dp"
-                        android:background="@drawable/bg_icon_tile"
-                        android:padding="5dp">
-
-                        <ImageView
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:src="@drawable/india"
-                            android:scaleType="fitCenter"
-                            android:contentDescription="BGMI icon" />
-                    </FrameLayout>
-
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:layout_marginStart="14dp"
-                        android:layout_weight="1">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="BGMI · Fire Edition"
-                            style="@style/AppText.Title"
-                            android:textSize="15sp" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="3dp"
-                            android:text="com.pubg.imobile"
-                            style="@style/AppText.Caption" />
-                    </LinearLayout>
-
-                    <androidx.appcompat.widget.AppCompatButton
-                        android:id="@+id/startBgmi"
-                        android:layout_width="wrap_content"
-                        android:layout_height="48dp"
-                        android:paddingStart="20dp"
-                        android:paddingEnd="20dp"
-                        android:text="Launch"
-                        android:drawableStart="@drawable/ic_play"
-                        android:drawablePadding="7dp"
-                        android:drawableTint="@color/on_accent"
-                        android:fontFamily="@font/bold"
-                        android:textSize="13sp"
-                        android:textColor="@color/on_accent"
-                        android:background="@drawable/loader_button" />
-                </LinearLayout>
-
-                <androidx.appcompat.widget.AppCompatButton
-                    android:id="@+id/copyObb"
-                    android:layout_width="match_parent"
-                    android:layout_height="50dp"
-                    android:layout_marginTop="14dp"
-                    android:text="Prepare game data"
-                    android:drawableStart="@drawable/ic_download"
-                    android:drawablePadding="8dp"
-                    android:drawableTint="@color/text_secondary"
-                    android:fontFamily="@font/bold"
-                    android:textSize="13sp"
-                    android:textColor="@color/text_secondary"
-                    android:background="@drawable/loader_button_outline"
-                    android:visibility="gone" />
-            </LinearLayout>
-
-            <!-- Status footer -->
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginTop="24dp"
                 android:orientation="horizontal"
                 android:gravity="center_vertical">
 
-                <ImageView
-                    android:layout_width="15dp"
-                    android:layout_height="15dp"
-                    android:src="@drawable/ic_shield"
-                    android:tint="@color/success"
-                    android:contentDescription="@null" />
+                <FrameLayout
+                    android:layout_width="52dp"
+                    android:layout_height="52dp"
+                    android:background="@drawable/bg_icon_tile"
+                    android:padding="4dp">
 
-                <TextView
-                    android:layout_width="wrap_content"
+                    <ImageView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:src="@drawable/india"
+                        android:scaleType="fitCenter"
+                        android:contentDescription="BGMI icon" />
+                </FrameLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="6dp"
-                    android:text="System ready  ·  Session secured"
-                    style="@style/AppText.Overline"
-                    android:textColor="@color/text_muted"
-                    android:letterSpacing="0.08" />
+                    android:layout_weight="1"
+                    android:layout_marginStart="14dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="BGMI"
+                        android:fontFamily="@font/bold"
+                        android:textSize="16sp"
+                        android:includeFontPadding="false"
+                        android:textColor="@color/text_primary" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:text="com.pubg.imobile"
+                        android:fontFamily="@font/font"
+                        android:textSize="12sp"
+                        android:includeFontPadding="false"
+                        android:textColor="@color/text_muted" />
+                </LinearLayout>
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/startBgmi"
+                    android:layout_width="wrap_content"
+                    android:layout_height="46dp"
+                    android:paddingStart="22dp"
+                    android:paddingEnd="22dp"
+                    android:text="Launch"
+                    android:fontFamily="@font/bold"
+                    android:textSize="14sp"
+                    android:includeFontPadding="false"
+                    android:textColor="@color/on_accent"
+                    android:background="@drawable/loader_button" />
             </LinearLayout>
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/copyObb"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginTop="12dp"
+                android:text="Prepare game data"
+                android:fontFamily="@font/bold"
+                android:textSize="14sp"
+                android:includeFontPadding="false"
+                android:textColor="@color/text_secondary"
+                android:background="@drawable/loader_button_outline"
+                android:visibility="gone" />
         </LinearLayout>
-    </ScrollView>
-</FrameLayout>
+    </LinearLayout>
+</ScrollView>
