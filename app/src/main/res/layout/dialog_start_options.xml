@@ -3,69 +3,75 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:background="@drawable/loader_card_highlight"
+    android:background="@drawable/loader_card"
     android:padding="22dp">
+
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="START OPTIONS"
-        android:textColor="@color/text_primary"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        android:letterSpacing="0.06" />
+        android:text="Start options"
+        android:fontFamily="@font/bold"
+        android:textSize="18sp"
+        android:includeFontPadding="false"
+        android:textColor="@color/text_primary" />
+
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Choose an action for your BGMI session"
-        android:textColor="@color/text_secondary"
-        android:textSize="12sp"
-        android:layout_marginTop="5dp"
-        android:layout_marginBottom="18dp" />
+        android:layout_marginTop="4dp"
+        android:text="Choose an action"
+        android:fontFamily="@font/font"
+        android:textSize="13sp"
+        android:includeFontPadding="false"
+        android:textColor="@color/text_secondary" />
+
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/optionLaunch"
         android:layout_width="match_parent"
         android:layout_height="52dp"
-        android:text="LAUNCH BGMI"
-        android:textAllCaps="true"
-        android:textColor="@color/black"
-        android:textSize="13sp"
-        android:textStyle="bold"
-        android:letterSpacing="0.06"
+        android:layout_marginTop="22dp"
+        android:text="Launch BGMI"
+        android:fontFamily="@font/bold"
+        android:textSize="14sp"
+        android:includeFontPadding="false"
+        android:textColor="@color/on_accent"
         android:background="@drawable/loader_button" />
+
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/optionCopyObb"
         android:layout_width="match_parent"
         android:layout_height="52dp"
         android:layout_marginTop="10dp"
-        android:text="COPY OBB FILE"
-        android:textAllCaps="true"
-        android:textColor="@color/secondary"
-        android:textSize="13sp"
-        android:textStyle="bold"
-        android:letterSpacing="0.06"
+        android:text="Copy OBB file"
+        android:fontFamily="@font/bold"
+        android:textSize="14sp"
+        android:includeFontPadding="false"
+        android:textColor="@color/text_secondary"
         android:background="@drawable/loader_button_outline" />
+
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/optionClearLogin"
         android:layout_width="match_parent"
         android:layout_height="52dp"
         android:layout_marginTop="10dp"
-        android:text="CLEAR LOGIN DATA"
-        android:textAllCaps="true"
+        android:text="Clear login data"
+        android:fontFamily="@font/bold"
+        android:textSize="14sp"
+        android:includeFontPadding="false"
         android:textColor="@color/text_secondary"
-        android:textSize="13sp"
-        android:textStyle="bold"
-        android:letterSpacing="0.04"
-        android:background="@drawable/loader_input" />
+        android:background="@drawable/loader_button_outline" />
+
     <TextView
         android:id="@+id/optionClose"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:text="CANCEL"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="14dp"
+        android:padding="10dp"
+        android:text="Cancel"
+        android:fontFamily="@font/font"
+        android:textSize="13sp"
+        android:includeFontPadding="false"
         android:textColor="@color/text_muted"
-        android:textSize="11sp"
-        android:textStyle="bold"
-        android:letterSpacing="0.12"
-        android:padding="12dp"
-        android:layout_marginTop="7dp" />
+        android:background="?attr/selectableItemBackground" />
 </LinearLayout>

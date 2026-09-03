@@ -169,6 +169,43 @@ std::string CalcSHA256(std::string s) {
     return result;
 }
 
+/**
+ * SERVER CONFIGURATION
+ * --------------------
+ * When you deploy your own server (Vercel), change BOTH URLs below to
+ *      https://YOUR-PROJECT.vercel.app
+ * - Check()  -> /server          (login / activation)
+ * - GetServerStatus() -> /api/status (maintenance + announcements)
+ */
+extern "C"
+JNIEXPORT jstring JNICALL
+Java_com_ryzen_LogAct_GetServerStatus(JNIEnv *env, jobject thiz) {
+    struct MemoryStruct chunk{};
+    chunk.memory = (char *) malloc(1);
+    chunk.size = 0;
+
+    CURL *curl = curl_easy_init();
+    if (curl) {
+        curl_easy_setopt(curl, CURLOPT_URL, oxorany("https://ryzencheat.authapi.xyz/api/status"));
+        curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1);
+        curl_easy_setopt(curl, CURLOPT_HTTPGET, 1);
+        curl_easy_setopt(curl, CURLOPT_DEFAULT_PROTOCOL, oxorany("https"));
+        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteMemoryCallback);
+        curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *) &chunk);
+        curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0);
+        curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0);
+        curl_easy_setopt(curl, CURLOPT_SSL_VERIFYSTATUS, 0);
+        curl_easy_setopt(curl, CURLOPT_TIMEOUT, 10L);
+        curl_easy_setopt(curl, CURLOPT_USERAGENT, oxorany(""));
+        curl_easy_perform(curl);
+    }
+    curl_easy_cleanup(curl);
+
+    jstring result = env->NewStringUTF(chunk.memory != nullptr ? chunk.memory : "");
+    free(chunk.memory);
+    return result;
+}
+
 
 extern "C"
 JNIEXPORT jstring JNICALL

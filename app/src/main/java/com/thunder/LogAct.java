@@ -32,9 +32,12 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.File;
@@ -66,7 +69,7 @@ public class LogAct extends AppCompatActivity {
     private EditText textUsername;
     private Button btnLogin;
     private ImageView pasteBtn;
-    private TextView getKey;
+    private View getKey;
     private File loaderKeyFile;
     private Dialog loadingDialog;
 
@@ -96,7 +99,7 @@ public class LogAct extends AppCompatActivity {
 
         prefs = new Prefs(this);
 
-        // 🔑 Check permissions
+        // Check permissions
         checkAndRequestPermissions();
 
         textUsername = findViewById(R.id.userkey);
@@ -151,11 +154,84 @@ public class LogAct extends AppCompatActivity {
                 Toast.makeText(this, "Clipboard empty", Toast.LENGTH_SHORT).show();
             }
         });
+
+        // Server status: maintenance mode + announcements
+        findViewById(R.id.maintenanceRetry).setOnClickListener(v -> {
+            findViewById(R.id.maintenanceOverlay).setVisibility(View.GONE);
+            fetchServerStatus();
+        });
+        fetchServerStatus();
+    }
+
+    /**
+     * Fetches /api/status on a background thread and applies it to the UI:
+     * - maintenance ON  -> show the full-screen maintenance overlay
+     * - announcements    -> show the latest two on the login card
+     * Server unreachable or invalid JSON leaves the normal login untouched.
+     */
+    private void fetchServerStatus() {
+        new Thread(() -> {
+            try {
+                String raw = GetServerStatus();
+                if (raw == null || raw.trim().isEmpty()) return;
+                JSONObject status = new JSONObject(raw);
+                final boolean maintenance = status.optBoolean("maintenance", false);
+                final String message = status.optString("maintenanceMessage", "We'll be back soon.");
+                final JSONArray announcements = status.optJSONArray("announcements");
+                runOnUiThread(() -> {
+                    if (maintenance) {
+                        ((TextView) findViewById(R.id.maintenanceMessage)).setText(message);
+                        findViewById(R.id.maintenanceOverlay).setVisibility(View.VISIBLE);
+                    } else {
+                        findViewById(R.id.maintenanceOverlay).setVisibility(View.GONE);
+                        renderAnnouncements(announcements);
+                    }
+                });
+            } catch (Exception ignored) {
+                // Server offline or malformed response -> leave normal login UI.
+            }
+        }).start();
+    }
+
+    private void renderAnnouncements(JSONArray announcements) {
+        LinearLayout card = findViewById(R.id.announcementCard);
+        if (card == null) return;
+        if (announcements == null || announcements.length() == 0) {
+            card.setVisibility(View.GONE);
+            return;
+        }
+
+        TextView title1 = findViewById(R.id.announcementTitle1);
+        TextView body1 = findViewById(R.id.announcementBody1);
+        TextView title2 = findViewById(R.id.announcementTitle2);
+        TextView body2 = findViewById(R.id.announcementBody2);
+
+        try {
+            JSONObject first = announcements.getJSONObject(0);
+            title1.setText(first.optString("title", ""));
+            body1.setText(first.optString("body", ""));
+
+            if (announcements.length() > 1) {
+                JSONObject second = announcements.getJSONObject(1);
+                title2.setText(second.optString("title", ""));
+                body2.setText(second.optString("body", ""));
+                title2.setVisibility(View.VISIBLE);
+                body2.setVisibility(View.VISIBLE);
+            } else {
+                title2.setVisibility(View.GONE);
+                body2.setVisibility(View.GONE);
+            }
+
+            boolean hasContent = title1.getText().length() > 0 || body1.getText().length() > 0;
+            card.setVisibility(hasContent ? View.VISIBLE : View.GONE);
+        } catch (Exception ignored) {
+            card.setVisibility(View.GONE);
+        }
     }
    
 
 
-    // 🔧 Permissions handling
+    // Permissions handling
     private void checkAndRequestPermissions() {
         android.content.SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
         boolean permissionsGranted = prefs.getBoolean(PREF_PERMISSIONS_GRANTED, false);
@@ -203,7 +279,9 @@ public class LogAct extends AppCompatActivity {
             checkAndRequestPermissions();
         } else if (requestCode == REQUEST_MANAGE_UNKNOWN_APP_SOURCES) {
             if (canRequestPackageInstalls()) {
-                android.os.Process.killProcess(android.os.Process.myPid());
+                // Re-initialize the activity with the freshly granted permission
+                // instead of killing the process (which looked like a crash).
+                recreate();
             }
         }
     }
@@ -242,7 +320,7 @@ public class LogAct extends AppCompatActivity {
         return false;
     }
 
-    // 🔑 Login
+    // Login
     private void Login(final Context m_Context, final String userKey) {
         showLoadingDialog("Checking key...", false);
 
@@ -316,7 +394,7 @@ public class LogAct extends AppCompatActivity {
         return dialog;
     }
 
-    // 🔧 Dialog (main)
+    // Dialog (main)
     private void showLoadingDialog(String message, boolean isError) {
         if (loadingDialog == null) {
             loadingDialog = new Dialog(this);
@@ -354,7 +432,7 @@ public class LogAct extends AppCompatActivity {
     // --- Natives
     private static native String Check(Context mContext, String userKey);
     private native String GetKey();
-    
-    
- 
+    private native String GetServerStatus();
+
+
 }
