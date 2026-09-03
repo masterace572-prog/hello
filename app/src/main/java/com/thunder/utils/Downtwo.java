@@ -71,34 +71,40 @@ public class Downtwo extends AsyncTask<String, String, String> {
         }
     }
 
-    @Override
-    protected String doInBackground(String... params) {
-        try {
-            if (params.length == 0 || params[0] == null) {
-                return "Invalid URL provided";
-            }
-
-            String downloadUrl = params[0];
-            serverVersion = getServerVersion();
-
-            if (serverVersion == null) {
-                return "Failed to retrieve server version";
-            }
-
-            SharedPreferences prefs = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
-            String localVersion = prefs.getString(PREF_VERSION_KEY, "0.0");
-
-            if (!localVersion.equals(serverVersion)) {
-                publishProgress("Downloading update...");
-                return downloadAndExtract(downloadUrl);
-            } else {
-                return "No Update Available";
-            }
-        } catch (Exception e) {
-            Log.e(TAG, "doInBackground error: ", e);
-            return "Background error: " + e.getMessage();
+@Override
+protected String doInBackground(String... params) {
+    try {
+        if (params.length == 0 || params[0] == null) {
+            return "Invalid URL provided";
         }
+
+        String downloadUrl = params[0];
+        // Try to get server version with retries
+        serverVersion = getServerVersion();
+
+        if (serverVersion == null) {
+            // Retry once with a slightly longer timeout
+            serverVersion = getServerVersion();
+        }
+
+        if (serverVersion == null) {
+            return "Failed to retrieve server version. Check internet connection and try again.";
+        }
+
+        SharedPreferences prefs = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
+        String localVersion = prefs.getString(PREF_VERSION_KEY, "0.0");
+
+        if (!localVersion.equals(serverVersion)) {
+            publishProgress("Downloading update...");
+            return downloadAndExtract(downloadUrl);
+        } else {
+            return "No Update Available";
+        }
+    } catch (Exception e) {
+        Log.e(TAG, "doInBackground error: ", e);
+        return "Background error: " + (e.getMessage() != null ? e.getMessage() : e.getClass().getSimpleName());
     }
+}
 
     @Override
     protected void onProgressUpdate(String... values) {

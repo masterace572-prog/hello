@@ -277,13 +277,16 @@ async function renderKeys() {
   content.append(toolbar);
 
   if (!data.keys.length) {
-    content.append(el("div", { class: "card" }, [el("div", { class: "empty", text: "No keys found." })]));
+    content.append(el("div", { class: "empty" }, [
+      el("div", { style: "font-size: 24px; margin-bottom: 8px;" }, "Key"),
+      el("p", {}, "No license keys found")
+    ]));
     return;
   }
 
   const table = el("table", {}, [
     el("thead", {}, [
-      el("tr", {}, ["Key", "Status", "Expires", "Devices", "Note", ""].map((h) => el("th", { text: h })))
+      el("tr", {}, ["Key", "Status", "Expires", "Devices"].map((h) => el("th", { text: h })))
     ]),
     el("tbody", {}, data.keys.map((k) => keyRow(k)))
   ]);
@@ -298,31 +301,28 @@ function debouncedKeys() {
 
 function badgeFor(key) {
   const now = Date.now();
-  if (key.status === "disabled") return el("span", { class: "badge err", text: "Disabled" });
-  if (key.expiresAt && new Date(key.expiresAt).getTime() <= now) return el("span", { class: "badge warn", text: "Expired" });
-  return el("span", { class: "badge ok", text: "Active" });
+  if (key.status === "disabled") return el("span", { class: "badge err" }, "Disabled");
+  if (key.expiresAt && new Date(key.expiresAt).getTime() <= now) return el("span", { class: "badge warn" }, "Expired");
+  return el("span", { class: "badge ok" }, "Active");
 }
 
 function keyRow(k) {
   const devicesTxt = `${k.devices.length} / ${k.deviceLimit === 0 ? "∞" : k.deviceLimit}`;
+  const actions = [
+    iconBtn("copy", "Copy key", () => copyText(k.key)),
+    iconBtn("eye", "Details", () => openKeyDetails(k.id)),
+    iconBtn("refresh", "Reset HWID", () => resetHwidAction(k)),
+    iconBtn("trash", "Delete", () => deleteKeyAction(k), true)
+  ];
   const row = el("tr", {}, [
-    el("td", {}, [
-      el("div", { class: "key-cell" }, [
-        el("span", { class: "key-text mono", text: k.key }),
-        iconBtn("copy", "Copy key", () => copyText(k.key))
-      ])
+    el("td", { class: "key-cell" }, [
+      el("span", { class: "key-text mono", text: k.key })
     ]),
     el("td", {}, [badgeFor(k)]),
     el("td", { class: "muted", text: k.expiresAt ? fmtDate(k.expiresAt) : "Never" }),
-    el("td", { text: devicesTxt }),
-    el("td", { class: "muted", text: k.note || "—" }),
-    el("td", {}, [
-      el("div", { class: "row-actions" }, [
-        iconBtn("eye", "Details", () => openKeyDetails(k.id)),
-        iconBtn("refresh", "Reset HWID", () => resetHwidAction(k)),
-        iconBtn("trash", "Delete", () => deleteKeyAction(k), true)
-      ])
-    ])
+    el("td", {}, { text: devicesTxt }),
+    el("td", {}, { text: k.note || "—" }),
+    el("td", {}, [el("div", { class: "row-actions" }, actions)])
   ]);
   return row;
 }
