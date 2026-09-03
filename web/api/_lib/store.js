@@ -16,6 +16,76 @@ const fs = require("fs");
 const path = require("path");
 
 const DB_KEY = "viper_db_v1";
+const SUPABASE_TABLE = "viper_data";
+
+/* ---------------- Supabase (Postgres via PostgREST) ---------------- */
+
+function supabaseConfigured() {
+  return Boolean(
+    process.env.SUPABASE_URL &&
+      (process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY)
+  );
+}
+
+function supabaseHeaders() {
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY;
+  return {
+    apikey: key,
+    Authorization: `Bearer ${key}`,
+    "Content-Type": "application/json",
+    "Prefer": "return=representation"
+  };
+}
+
+function supabaseUrl(path, query) {
+  const base = process.env.SUPABASE_URL.replace(/\/+$/, "");
+  const url = new URL(`/rest/v1/${path}`, base);
+  if (query) for (const [k, v] of Object.entries(query)) url.searchParams.set(k, v);
+  return url.toString();
+}
+
+async function supabaseSeedOnce() {
+  const res = await fetch(
+    supabaseUrl(SUPABASE_TABLE),
+    { method: "POST", headers: supabaseHeaders(), body: JSON.stringify({ id: 1, doc: seed() }) }
+  );
+  // 201 created, 409 already exists - both fine
+}
+
+async function supabaseGet() {
+  const res = await fetch(
+    supabaseUrl(SUPABASE_TABLE, { id: "eq.1", select: "doc" }),
+    { headers: supabaseHeaders() }
+  );
+  if (!res.ok) {
+    const text = await res.text().catch(() => "");
+    throw new Error(`Supabase error (${res.status}) - did you run schema.sql? ${text.slice(0, 160)}`);
+  }
+  const rows = await res.json();
+  if (Array.isArray(rows) && rows.length) return rows[0].doc;
+  await supabaseSeedOnce().catch(() => {});
+  const retry = await fetch(
+    supabaseUrl(SUPABASE_TABLE, { id: "eq.1", select: "doc" }),
+    { headers: supabaseHeaders() }
+  );
+  if (!retry.ok) throw new Error("Supabase seed failed");
+  const retryRows = await retry.json();
+  if (!Array.isArray(retryRows) || !retryRows.length) throw new Error("Supabase row missing after seed");
+  return retryRows[0].doc;
+}
+
+async function supabaseSet(value) {
+  const res = await fetch(
+    supabaseUrl(SUPABASE_TABLE, { id: "eq.1" }),
+    { method: "PATCH", headers: supabaseHeaders(), body: JSON.stringify({ doc: value }) }
+  );
+  if (!res.ok) {
+    const text = await res.text().catch(() => "");
+    throw new Error(`Supabase write failed (${res.status}) - ${text.slice(0, 160)}`);
+  }
+}
+
+/* ---------------- Vercel KV (Upstash Redis) ------------------------ */
 
 function kvConfigured() {
   return Boolean(process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN);
@@ -74,17 +144,18 @@ function withLock(fn) {
 
 async function mutate(mutator) {
   return withLock(async () => {
-    const db = kvConfigured() ? await kvGet() : localGet();
+    const db = supabaseConfigured() ? await supabaseGet() : kvConfigured() ? await kvGet() : localGet();
     const current = db || seed();
     const next = mutator(JSON.parse(JSON.stringify(current)));
-    if (kvConfigured()) await kvSet(next);
+    if (supabaseConfigured()) await supabaseSet(next);
+    else if (kvConfigured()) await kvSet(next);
     else localSet(next);
     return next;
   });
 }
 
 async function read() {
-  const db = kvConfigured() ? await kvGet() : localGet();
+  const db = supabaseConfigured() ? await supabaseGet() : kvConfigured() ? await kvGet() : localGet();
   return db || seed();
 }
 
@@ -104,7 +175,14 @@ function seed() {
 }
 
 function storageMode() {
-  return kvConfigured() ? "kv" : "local";
+  return supabaseConfigured() ? "supabase" : kvConfigured() ? "kv" : "local";
 }
 
-module.exports = { read, mutate, seed, storageMode, kvConfigured };
+module.exports = {
+  read,
+  mutate,
+  seed,
+  storageMode,
+  kvConfigured,
+  supabaseConfigured
+};

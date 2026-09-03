@@ -35,13 +35,23 @@ repository to Vercel.
    | `KV_REST_API_TOKEN` | set automatically by the KV integration | With KV |
    | `SESSION_SECRET` | random string for session signing | Recommended |
 
-6. **Storage** (only if you want persistent production data): Store →
-   Create → **Vercel KV** (or Upstash Redis) and connect it to the
-   project. It injects `KV_REST_API_URL` / `KV_REST_API_TOKEN`
-   automatically.
-   - Without KV, the API falls back to `web/data/db.json`. That works in
-     `vercel dev` and for local testing, but serverless instances do not
-     persist files — use KV in production.
+6. **Database (required for production).** Two options:
+
+   **Option A — Supabase (recommended):**
+   - Create a Supabase project (free tier is fine).
+   - SQL Editor → paste and run `web/supabase/schema.sql` (creates the
+     `viper_data` table and seeds it).
+   - Project Settings → API → copy `Project URL` and `service_role` key
+     (keep the service role key server-side only; never expose it).
+   - Add these Vercel environment variables:
+     `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`.
+
+   **Option B — Vercel KV:** Store → Create → **Vercel KV** and connect
+   it; it injects `KV_REST_API_URL` / `KV_REST_API_TOKEN` automatically.
+
+   - Without either, the API falls back to `web/data/db.json`. That
+     works in `vercel dev` and for local testing, but serverless
+     instances do not persist files — data would be lost in production.
 7. Deploy. Your admin panel: `https://<project>.vercel.app/`
    Sign in with `ADMIN_PASSWORD`.
 

@@ -126,7 +126,10 @@ function showApp() {
   $("#view-login").classList.add("hidden");
   $("#view-app").classList.remove("hidden");
   const badge = $("#storage-badge");
-  if (session.storageMode === "kv") {
+  if (session.storageMode === "supabase") {
+    badge.textContent = "Storage: Supabase";
+    badge.className = "storage-badge";
+  } else if (session.storageMode === "kv") {
     badge.textContent = "Storage: Vercel KV";
     badge.className = "storage-badge";
   } else {
@@ -199,8 +202,8 @@ async function renderOverview() {
   if (session.defaultPassword || !session.storageMode) {
     notices.push(el("div", { class: "notice", html: '<strong>Default admin password is in use.</strong> Set the <code>ADMIN_PASSWORD</code> environment variable in Vercel before going live.' }));
   }
-  if (session.storageMode !== "kv") {
-    notices.push(el("div", { class: "notice", html: '<strong>File storage is active.</strong> Data is only persisted while running locally. Add Vercel KV (Storage tab) for production persistence.' }));
+  if (session.storageMode !== "supabase" && session.storageMode !== "kv") {
+    notices.push(el("div", { class: "notice", html: '<strong>File storage is active.</strong> Data is only persisted while running locally. Connect Supabase or Vercel KV for production persistence.' }));
   }
   if (settings.settings.maintenance) {
     notices.push(el("div", { class: "notice", html: '<strong>Maintenance mode is ON.</strong> All activations are rejected until you turn it off.' }));
@@ -618,9 +621,14 @@ async function renderSettings() {
   const downloadUrl = el("input", { class: "input", value: settings.downloadUrl || "", placeholder: "https://.../DIE.zip" });
   const versionUrl = el("input", { class: "input", value: settings.versionUrl || "", placeholder: "https://.../version.txt" });
 
-  const storage = session.storageMode === "kv"
-    ? "Vercel KV - persistent across deployments and serverless instances."
-    : "Local file - only for local development. Add Vercel KV for production.";
+  let storage;
+  if (session.storageMode === "supabase") {
+    storage = "Supabase Postgres - persistent across deployments and serverless instances.";
+  } else if (session.storageMode === "kv") {
+    storage = "Vercel KV - persistent across deployments and serverless instances.";
+  } else {
+    storage = "Local file - only for local development. Add Supabase or Vercel KV for production.";
+  }
 
   content.innerHTML = "";
   content.append(
