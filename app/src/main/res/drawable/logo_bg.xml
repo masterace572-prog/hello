@@ -1,0 +1,24 @@
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="oval">
+
+    <!-- Background -->
+    <solid android:color="@android:color/white"/>
+
+    <!-- Size -->
+    <size
+        android:width="120dp"
+        android:height="120dp"/>
+
+    <!-- Soft Border (depth feel) -->
+    <stroke
+        android:width="2dp"
+        android:color="#1A000000"/>
+
+    <!-- Inner spacing -->
+    <padding
+        android:left="12dp"
+        android:top="12dp"
+        android:right="12dp"
+        android:bottom="12dp"/>
+
+</shape>

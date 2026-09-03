@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- ProgressBar Style -->
+    <style name="CustomProgressBarStyle" parent="Widget.AppCompat.ProgressBar">
+        <item name="android:indeterminateTint">@color/primary</item>
+        <item name="android:indeterminateTintMode">src_in</item>
+    </style>
+
+    <!-- Alert Dialog Style -->
+    <style name="AlertDialogStyle" parent="Theme.MaterialComponents.Dialog">
+        <!-- Background -->
+        <item name="android:windowBackground">@drawable/bg_card_dark</item>
+        <!-- Text Colors -->
+        <item name="android:textColorPrimary">@color/text_primary</item>
+        <item name="android:textColorSecondary">@color/text_secondary</item>
+        <!-- Width -->
+        <item name="android:windowMinWidthMinor">85%</item>
+        <!-- Smooth corners feel -->
+        <item name="android:windowIsTranslucent">true</item>
+    </style>
+
+</resources>

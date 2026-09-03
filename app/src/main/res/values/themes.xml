@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- Base App Theme -->
+    <style name="Base.AppTheme" parent="Theme.Material3.DayNight.NoActionBar">
+
+        <!-- Primary Colors -->
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
+
+        <!-- Background -->
+        <item name="android:colorBackground">@color/bg_dark</item>
+
+        <!-- Status Bar & Nav Bar -->
+        <item name="android:statusBarColor">@color/bg_dark</item>
+        <item name="android:navigationBarColor">@color/bg_dark</item>
+        <item name="android:windowLightStatusBar" tools:targetApi="m">false</item>
+
+    </style>
+
+    <!-- Bottom Navigation Active Indicator -->
+    <style name="ActiveIndicator" parent="Widget.Material3.BottomNavigationView.ActiveIndicator">
+        <item name="android:color">@color/primary</item>
+    </style>
+
+    <!-- Custom Checkbox -->
+    <style name="CustomCheckbox02" parent="Widget.AppCompat.CompoundButton.CheckBox">
+        <item name="android:button">@drawable/checkbox_selector</item>
+        <item name="android:background">@android:color/transparent</item>
+        <item name="android:buttonTint">@color/primary</item>
+    </style>
+
+</resources>

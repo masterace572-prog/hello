@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:padding="28dp"
+    android:elevation="12dp"
+    android:background="@drawable/loader_card_highlight">
+    <ImageView
+        android:id="@+id/loadingIcon"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:src="@drawable/ic_launcher"
+        android:padding="8dp"
+        android:layout_marginBottom="12dp"
+        android:contentDescription="Loading" />
+    <TextView
+        android:id="@+id/loadingText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Logging in..."
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:textColor="@color/text_primary"
+        android:layout_marginTop="4dp" />
+    <ProgressBar
+        android:id="@+id/progressBar"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="180dp"
+        android:layout_height="6dp"
+        android:layout_marginTop="16dp"
+        android:indeterminate="true"
+        android:progressTint="@color/secondary"
+        android:indeterminateTint="@color/secondary" />
+    <TextView
+        android:id="@+id/progressText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Please wait..."
+        android:textSize="12sp"
+        android:textColor="@color/text_secondary"
+        android:layout_marginTop="10dp" />
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/okButton"
+        android:layout_width="140dp"
+        android:layout_height="42dp"
+        android:text="OK"
+        android:textAllCaps="true"
+        android:textSize="13sp"
+        android:textStyle="bold"
+        android:textColor="@color/black"
+        android:background="@drawable/loader_button"
+        android:visibility="gone"
+        android:layout_marginTop="18dp" />
+</LinearLayout>
