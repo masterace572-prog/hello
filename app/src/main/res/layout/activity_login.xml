@@ -1,0 +1,263 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/loader_bg">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true"
+        android:overScrollMode="never"
+        android:scrollbars="none">
+
+        <LinearLayout
+            android:id="@+id/loginCard"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center_horizontal"
+            android:layout_gravity="center"
+            android:paddingStart="24dp"
+            android:paddingEnd="24dp"
+            android:paddingTop="32dp"
+            android:paddingBottom="32dp">
+
+            <!-- Logo -->
+            <ImageView
+                android:id="@+id/logo"
+                android:layout_width="72dp"
+                android:layout_height="72dp"
+                android:src="@drawable/ic_launcher"
+                android:scaleType="fitCenter"
+                android:contentDescription="Application logo" />
+
+            <!-- Heading -->
+            <TextView
+                android:id="@+id/title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:text="Welcome back"
+                android:fontFamily="@font/bold"
+                android:textSize="26sp"
+                android:includeFontPadding="false"
+                android:textColor="@color/text_primary" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="Sign in to your account"
+                android:fontFamily="@font/font"
+                android:textSize="14sp"
+                android:includeFontPadding="false"
+                android:textColor="@color/text_secondary" />
+
+            <!-- Sign-in card -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="36dp"
+                android:orientation="vertical"
+                android:background="@drawable/loader_card"
+                android:padding="20dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="License key"
+                    android:fontFamily="@font/font"
+                    android:textSize="13sp"
+                    android:includeFontPadding="false"
+                    android:textColor="@color/text_secondary" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="54dp"
+                    android:layout_marginTop="10dp"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:background="@drawable/loader_input"
+                    android:paddingStart="14dp"
+                    android:paddingEnd="4dp">
+
+                    <EditText
+                        android:id="@+id/userkey"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:hint="Enter your key"
+                        android:fontFamily="@font/font"
+                        android:textSize="15sp"
+                        android:includeFontPadding="false"
+                        android:textColor="@color/text_primary"
+                        android:textColorHint="@color/text_muted"
+                        android:background="@android:color/transparent"
+                        android:singleLine="true"
+                        android:inputType="text"
+                        android:paddingStart="0dp" />
+
+                    <ImageView
+                        android:id="@+id/paste"
+                        android:layout_width="42dp"
+                        android:layout_height="42dp"
+                        android:src="@drawable/ic_paste"
+                        android:tint="@color/text_secondary"
+                        android:padding="10dp"
+                        android:contentDescription="Paste license key"
+                        android:background="?attr/selectableItemBackgroundBorderless" />
+                </LinearLayout>
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/login"
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:layout_marginTop="16dp"
+                    android:text="Sign in"
+                    android:fontFamily="@font/bold"
+                    android:textSize="15sp"
+                    android:includeFontPadding="false"
+                    android:textColor="@color/on_accent"
+                    android:background="@drawable/loader_button" />
+            </LinearLayout>
+
+            <!-- Get key link -->
+            <TextView
+                android:id="@+id/GetKey"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:padding="8dp"
+                android:text="Get a license key"
+                android:fontFamily="@font/font"
+                android:textSize="14sp"
+                android:includeFontPadding="false"
+                android:textColor="@color/text_secondary"
+                android:background="?attr/selectableItemBackground" />
+
+            <!-- Announcements (filled by LogAct from /api/status) -->
+            <LinearLayout
+                android:id="@+id/announcementCard"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:orientation="vertical"
+                android:background="@drawable/loader_card"
+                android:padding="18dp"
+                android:visibility="gone">
+
+                <TextView
+                    android:id="@+id/announcementTitle1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text=""
+                    android:fontFamily="@font/bold"
+                    android:textSize="14sp"
+                    android:includeFontPadding="false"
+                    android:textColor="@color/text_primary" />
+
+                <TextView
+                    android:id="@+id/announcementBody1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text=""
+                    android:fontFamily="@font/font"
+                    android:textSize="13sp"
+                    android:includeFontPadding="false"
+                    android:textColor="@color/text_secondary" />
+
+                <TextView
+                    android:id="@+id/announcementTitle2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:text=""
+                    android:fontFamily="@font/bold"
+                    android:textSize="14sp"
+                    android:includeFontPadding="false"
+                    android:textColor="@color/text_primary"
+                    android:visibility="gone" />
+
+                <TextView
+                    android:id="@+id/announcementBody2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text=""
+                    android:fontFamily="@font/font"
+                    android:textSize="13sp"
+                    android:includeFontPadding="false"
+                    android:textColor="@color/text_secondary"
+                    android:visibility="gone" />
+            </LinearLayout>
+
+            <!-- Footer -->
+            <TextView
+                android:id="@+id/footer"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="36dp"
+                android:text="© 2026 Viper Cheat"
+                android:fontFamily="@font/font"
+                android:textSize="12sp"
+                android:includeFontPadding="false"
+                android:textColor="@color/text_muted" />
+        </LinearLayout>
+    </ScrollView>
+
+    <!-- Maintenance overlay (shown when /api/status reports maintenance) -->
+    <LinearLayout
+        android:id="@+id/maintenanceOverlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:background="@drawable/loader_bg"
+        android:padding="32dp"
+        android:visibility="gone">
+
+        <ImageView
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:src="@drawable/ic_launcher"
+            android:scaleType="fitCenter"
+            android:contentDescription="Application logo" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="Under maintenance"
+            android:fontFamily="@font/bold"
+            android:textSize="22sp"
+            android:includeFontPadding="false"
+            android:textColor="@color/text_primary" />
+
+        <TextView
+            android:id="@+id/maintenanceMessage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="We'll be back soon."
+            android:fontFamily="@font/font"
+            android:textSize="14sp"
+            android:includeFontPadding="false"
+            android:gravity="center"
+            android:textColor="@color/text_secondary" />
+
+        <TextView
+            android:id="@+id/maintenanceRetry"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:padding="10dp"
+            android:text="Check again"
+            android:fontFamily="@font/font"
+            android:textSize="14sp"
+            android:includeFontPadding="false"
+            android:textColor="@color/text_secondary"
+            android:background="?attr/selectableItemBackground" />
+    </LinearLayout>
+</FrameLayout>
