@@ -21,6 +21,10 @@ std::string Enc;
 static char ZENINOP[64];
 static std::string exdate = oxorany ("NULL");
 
+// App version used for in-app update checks. Bump together with the
+// admin panel "App update" version when publishing a new APK.
+static const char *APP_VERSION = "1.0";
+
 std::string g_Token, g_Auth;
 
 bool xConnected = false, xServerConnection = false, memek = false;
@@ -44,17 +48,15 @@ Java_com_ryzen_LogAct_GetKey(JNIEnv *env, jobject thiz) {
 extern "C"
 JNIEXPORT jstring JNICALL
 Java_com_ryzen_utils_Downtwo_Version(JNIEnv *env, jclass clazz) {
-    // return URL to version file
-    const char *versionUrl = (oxorany("https://github.com/AkhilRyzen/Ryzen/releases/download/Ryzen/version.txt"));// can put GitHub too
-    return env->NewStringUTF(versionUrl);
+    // Version of the library zip, served from the admin panel DB
+    return env->NewStringUTF(oxorany("https://hello-five-mocha.vercel.app/api/lib/version"));
 }
 
 extern "C"
 JNIEXPORT jstring JNICALL
 Java_com_ryzen_utils_Downtwo_Link(JNIEnv *env, jclass clazz) {
-    // return URL to your update ZIP file
-    const char *downloadUrl = (oxorany("https://github.com/AkhilRyzen/Ryzen/releases/download/Ryzen/hb.zip"));// can put GitHub too
-    return env->NewStringUTF(downloadUrl);
+    // Download URL of the library zip, configured in the admin panel
+    return env->NewStringUTF(oxorany("https://hello-five-mocha.vercel.app/api/lib/file"));
 }
 
 extern "C"
@@ -172,10 +174,11 @@ std::string CalcSHA256(std::string s) {
 /**
  * SERVER CONFIGURATION
  * --------------------
- * When you deploy your own server (Vercel), change BOTH URLs below to
- *      https://YOUR-PROJECT.vercel.app
+ * Points to the deployed Vercel server:
  * - Check()  -> /server          (login / activation)
- * - GetServerStatus() -> /api/status (maintenance + announcements)
+ * - GetServerStatus() -> /api/status (maintenance + announcements + updates)
+ * - Downtwo Version()/Link() -> /api/lib/version, /api/lib/file (lib zip,
+ *   version + URL are managed in the admin panel "Updates" page)
  */
 extern "C"
 JNIEXPORT jstring JNICALL
@@ -186,7 +189,7 @@ Java_com_ryzen_LogAct_GetServerStatus(JNIEnv *env, jobject thiz) {
 
     CURL *curl = curl_easy_init();
     if (curl) {
-        curl_easy_setopt(curl, CURLOPT_URL, oxorany("https://ryzencheat.authapi.xyz/api/status"));
+        curl_easy_setopt(curl, CURLOPT_URL, oxorany("https://hello-five-mocha.vercel.app/api/status"));
         curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1);
         curl_easy_setopt(curl, CURLOPT_HTTPGET, 1);
         curl_easy_setopt(curl, CURLOPT_DEFAULT_PROTOCOL, oxorany("https"));
@@ -209,8 +212,9 @@ Java_com_ryzen_LogAct_GetServerStatus(JNIEnv *env, jobject thiz) {
 
 extern "C"
 JNIEXPORT jstring JNICALL
-Java_com_ryzen_LogAct_Check(JNIEnv *env, jclass clazz, jobject mContext, jstring mUserKey) {
+Java_com_ryzen_LogAct_Check(JNIEnv *env, jclass clazz, jobject mContext, jstring mUserKey, jstring mAppVer) {
     auto user_key = env->GetStringUTFChars(mUserKey, 0);
+    auto app_ver = env->GetStringUTFChars(mAppVer, 0);
     std::string hwid = user_key;
     hwid += GetAndroidID(env, mContext);
     hwid += GetDeviceModel(env);
@@ -227,7 +231,7 @@ Java_com_ryzen_LogAct_Check(JNIEnv *env, jclass clazz, jobject mContext, jstring
     curl = curl_easy_init();
     if (curl) {
         char lol[1000];
-        sprintf(lol,oxorany("https://ryzencheat.authapi.xyz/server"));
+        sprintf(lol,oxorany("https://hello-five-mocha.vercel.app/server"));
         curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, oxorany("POST"));
         curl_easy_setopt(curl, CURLOPT_URL, lol);+
                 curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1);
@@ -238,7 +242,7 @@ Java_com_ryzen_LogAct_Check(JNIEnv *env, jclass clazz, jobject mContext, jstring
         headers = curl_slist_append(headers, oxorany("Charset: UTF-8"));
         curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
         char data[4096];
-        sprintf(data, oxorany("game=PUBG&user_key=%s&serial=%s"), user_key, UUID.c_str());
+        sprintf(data, oxorany("game=PUBG&user_key=%s&serial=%s&app_version=%s"), user_key, UUID.c_str(), app_ver);
         curl_easy_setopt(curl, CURLOPT_POST, 1);
         curl_easy_setopt(curl, CURLOPT_POSTFIELDS, data);
         curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteMemoryCallback);

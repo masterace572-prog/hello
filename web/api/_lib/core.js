@@ -8,26 +8,77 @@
 const crypto = require("crypto");
 const store = require("./store");
 
-const KEY_PREFIX = "VPR";
-const ALPHABET = "ABCDEFGHJKMNPQRSTUVWXYZ23456789"; // no ambiguous chars
+const KEY_PREFIX = "";
 
 function randomBlock(len) {
   let out = "";
   const bytes = crypto.randomBytes(len);
-  for (let i = 0; i < len; i++) out += ALPHABET[bytes[i] % ALPHABET.length];
+  const charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+  for (let i = 0; i < len; i++) out += charset[bytes[i] % charset.length];
   return out;
 }
 
 function generateKey() {
-  return `${KEY_PREFIX}-${randomBlock(4)}-${randomBlock(4)}-${randomBlock(4)}`;
+  return randomBlock(20);
 }
 
 function normalizeKey(raw) {
-  return String(raw || "").trim().toUpperCase();
+  if (!raw) return "";
+  // Remove any non-alphanumeric chars and uppercase
+  return String(raw).trim().replace(/[^A-Z0-9]/g, "").toUpperCase();
 }
 
 function now() {
   return Date.now();
+}
+
+/* ---------------- Updates config defaults (lib + app) ---------------- */
+
+const DEFAULT_UPDATES = {
+  lib: { version: "1.0", url: "", changelog: "" },
+  app: { version: "1.0", url: "", changelog: "", forced: true, minVersion: "1.0", enabled: false }
+};
+
+function effectiveSettings(raw) {
+  const s = raw || {};
+  const storedLib = (s.updates && s.updates.lib) || {};
+  const storedApp = (s.updates && s.updates.app) || {};
+  return {
+    maintenance: Boolean(s.maintenance),
+    maintenanceMessage: s.maintenanceMessage || "Server is under maintenance. Please try again later.",
+    licenseSecret: s.licenseSecret || "Vm8Lk7Uj2JmsjCPVPVjrLa7zgfx3uz9E",
+    announcements: Array.isArray(s.announcements) ? s.announcements : [],
+    downloadUrl: s.downloadUrl || "",
+    versionUrl: s.versionUrl || "",
+    updates: {
+      lib: {
+        version: storedLib.version || DEFAULT_UPDATES.lib.version,
+        url: storedLib.url || "",
+        changelog: storedLib.changelog || ""
+      },
+      app: {
+        version: storedApp.version || DEFAULT_UPDATES.app.version,
+        url: storedApp.url || "",
+        changelog: storedApp.changelog || "",
+        forced: storedApp.forced === undefined ? DEFAULT_UPDATES.app.forced : Boolean(storedApp.forced),
+        minVersion: storedApp.minVersion || DEFAULT_UPDATES.app.minVersion,
+        enabled: Boolean(storedApp.enabled)
+      }
+    }
+  };
+}
+
+/** Simple dotted version compare: returns true when a < b */
+function versionLt(a, b) {
+  const pa = String(a || "0").split(".").map((n) => parseInt(n, 10) || 0);
+  const pb = String(b || "0").split(".").map((n) => parseInt(n, 10) || 0);
+  const len = Math.max(pa.length, pb.length);
+  for (let i = 0; i < len; i++) {
+    const va = pa[i] || 0;
+    const vb = pb[i] || 0;
+    if (va !== vb) return va < vb;
+  }
+  return false;
 }
 
 function addDurationDays(days) {
@@ -81,7 +132,7 @@ function publicKeyShape(key) {
  * Failure:
  *   { "status": false, "reason": "<message>" }
  */
-async function activate({ userKey, serial, tz }) {
+async function activate({ userKey, serial, tz, appVersion }) {
   const key = normalizeKey(userKey);
   // Device serials are opaque (lowercase UUIDs on Android). They must be
   // hashed byte-exact as sent, so never case-normalize them.
@@ -94,10 +145,24 @@ async function activate({ userKey, serial, tz }) {
   let outcome = null;
 
   await store.mutate((db) => {
-    const settings = db.settings || {};
+    const settings = effectiveSettings(db.settings || {});
 
     if (settings.maintenance) {
       outcome = { status: false, reason: settings.maintenanceMessage || "Server is under maintenance." };
+      return db;
+    }
+
+    // Old-version shutdown: when an app update is pushed and the client is
+    // below the required minimum version, activation is rejected so the old
+    // APK can no longer be used.
+    const appConfig = settings.updates.app;
+    if (
+      appConfig.enabled &&
+      appConfig.url &&
+      String(appVersion || "").length > 0 &&
+      versionLt(appVersion, appConfig.minVersion)
+    ) {
+      outcome = { status: false, reason: "Update required. Please install the latest version of the app to continue." };
       return db;
     }
 
@@ -264,15 +329,14 @@ async function stats() {
 
 async function getSettings() {
   const db = await store.read();
-  const s = db.settings || {};
+  const s = effectiveSettings(db.settings || {});
   return {
-    maintenance: Boolean(s.maintenance),
-    maintenanceMessage: s.maintenanceMessage || "",
-    announcement: s.announcement || "",
-    announcementEnabled: Boolean(s.announcementEnabled),
-    announcements: (s.announcements || []).map((a) => ({ ...a })),
-    downloadUrl: s.downloadUrl || "",
-    versionUrl: s.versionUrl || ""
+    maintenance: s.maintenance,
+    maintenanceMessage: s.maintenanceMessage,
+    announcements: s.announcements.map((a) => ({ ...a })),
+    downloadUrl: s.downloadUrl,
+    versionUrl: s.versionUrl,
+    updates: s.updates
   };
 }
 
@@ -281,10 +345,25 @@ async function updateSettings(changes) {
     const s = db.settings || (db.settings = {});
     if (changes.maintenance !== undefined) s.maintenance = Boolean(changes.maintenance);
     if (changes.maintenanceMessage !== undefined) s.maintenanceMessage = String(changes.maintenanceMessage).slice(0, 500);
-    if (changes.announcement !== undefined) s.announcement = String(changes.announcement).slice(0, 1000);
-    if (changes.announcementEnabled !== undefined) s.announcementEnabled = Boolean(changes.announcementEnabled);
     if (changes.downloadUrl !== undefined) s.downloadUrl = String(changes.downloadUrl).slice(0, 1000);
     if (changes.versionUrl !== undefined) s.versionUrl = String(changes.versionUrl).slice(0, 1000);
+
+    // Updates (lib zip + app apk) - merged with defaults so old DB rows work
+    if (changes.updates) {
+      const u = s.updates || (s.updates = {});
+      const lib = u.lib || (u.lib = {});
+      const app = u.app || (u.app = {});
+      const upd = changes.updates;
+      if (upd.libVersion !== undefined) lib.version = String(upd.libVersion || "").slice(0, 40);
+      if (upd.libUrl !== undefined) lib.url = String(upd.libUrl || "").slice(0, 2000);
+      if (upd.libChangelog !== undefined) lib.changelog = String(upd.libChangelog || "").slice(0, 2000);
+      if (upd.appVersion !== undefined) app.version = String(upd.appVersion || "").slice(0, 40);
+      if (upd.apkUrl !== undefined) app.url = String(upd.apkUrl || "").slice(0, 2000);
+      if (upd.appChangelog !== undefined) app.changelog = String(upd.appChangelog || "").slice(0, 4000);
+      if (upd.appForced !== undefined) app.forced = Boolean(upd.appForced);
+      if (upd.appMinVersion !== undefined) app.minVersion = String(upd.appMinVersion || "1.0").slice(0, 40);
+      if (upd.appEnabled !== undefined) app.enabled = Boolean(upd.appEnabled);
+    }
     return db;
   });
   return getSettings();
@@ -340,6 +419,7 @@ module.exports = {
   normalizeKey,
   formatExp,
   md5,
+  effectiveSettings,
   activate,
   createKey,
   listKeys,
