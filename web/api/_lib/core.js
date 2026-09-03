@@ -8,22 +8,24 @@
 const crypto = require("crypto");
 const store = require("./store");
 
-const KEY_PREFIX = "VPR";
-const ALPHABET = "ABCDEFGHJKMNPQRSTUVWXYZ23456789"; // no ambiguous chars
+const KEY_PREFIX = "";
 
 function randomBlock(len) {
   let out = "";
   const bytes = crypto.randomBytes(len);
-  for (let i = 0; i < len; i++) out += ALPHABET[bytes[i] % ALPHABET.length];
+  const charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+  for (let i = 0; i < len; i++) out += charset[bytes[i] % charset.length];
   return out;
 }
 
 function generateKey() {
-  return `${KEY_PREFIX}-${randomBlock(4)}-${randomBlock(4)}-${randomBlock(4)}`;
+  return randomBlock(20);
 }
 
 function normalizeKey(raw) {
-  return String(raw || "").trim().toUpperCase();
+  if (!raw) return "";
+  // Remove any non-alphanumeric chars and uppercase
+  return String(raw).trim().replace(/[^A-Z0-9]/g, "").toUpperCase();
 }
 
 function now() {
