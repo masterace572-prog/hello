@@ -112,6 +112,24 @@ function readBody(req) {
   });
 }
 
+/** Binary-safe body reader (for file uploads). */
+function readRawBody(req, maxBytes) {
+  return new Promise((resolve, reject) => {
+    const chunks = [];
+    let total = 0;
+    req.on("data", (chunk) => {
+      chunks.push(chunk);
+      total += chunk.length;
+      if (total > maxBytes) {
+        reject(new Error("Payload too large"));
+        req.destroy();
+      }
+    });
+    req.on("end", () => resolve(Buffer.concat(chunks)));
+    req.on("error", reject);
+  });
+}
+
 module.exports = {
   adminPassword,
   usesDefaultPassword,
@@ -122,5 +140,6 @@ module.exports = {
   isAuthed,
   requireAuth,
   json,
-  readBody
+  readBody,
+  readRawBody
 };

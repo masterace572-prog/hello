@@ -36,6 +36,7 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+import androidx.core.content.FileProvider;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import javax.crypto.Cipher;
@@ -66,6 +67,9 @@ public class LogAct extends AppCompatActivity {
     private Prefs prefs;
     private final String USER = "USER";
 
+    // Must match APP_VERSION in app/src/main/jni/main.cpp
+    private static final String APP_VERSION = "1.0";
+
     private EditText textUsername;
     private Button btnLogin;
     private ImageView pasteBtn;
@@ -73,10 +77,19 @@ public class LogAct extends AppCompatActivity {
     private File loaderKeyFile;
     private Dialog loadingDialog;
 
+    // App (APK) update state
+    private Dialog updateDialog;
+    private ProgressBar updateProgress;
+    private TextView updateProgressText;
+    private File pendingApkFile;
+    private String pendingApkUrl;
+    private boolean updatePromptShown = false;
+
 
     // --- Permissions
     private static final int REQUEST_MANAGE_STORAGE_PERMISSION = 100;
     private static final int REQUEST_MANAGE_UNKNOWN_APP_SOURCES = 200;
+    private static final int REQUEST_INSTALL_UPDATE_PERMISSION = 300;
     private static final String PREFS_NAME = "com.ryzen.prefs";
     private static final String PREF_PERMISSIONS_GRANTED = "permissions_granted";
 
@@ -178,7 +191,12 @@ public class LogAct extends AppCompatActivity {
                 final boolean maintenance = status.optBoolean("maintenance", false);
                 final String message = status.optString("maintenanceMessage", "We'll be back soon.");
                 final JSONArray announcements = status.optJSONArray("announcements");
+                final JSONObject updates = status.optJSONObject("updates");
                 runOnUiThread(() -> {
+                    if (!updatePromptShown) {
+                        updatePromptShown = true;
+                        maybeShowAppUpdate(updates);
+                    }
                     if (maintenance) {
                         ((TextView) findViewById(R.id.maintenanceMessage)).setText(message);
                         findViewById(R.id.maintenanceOverlay).setVisibility(View.VISIBLE);
@@ -191,6 +209,153 @@ public class LogAct extends AppCompatActivity {
                 // Server offline or malformed response -> leave normal login UI.
             }
         }).start();
+    }
+
+    /* ---------------- App (APK) update handling ---------------- */
+
+    private void maybeShowAppUpdate(JSONObject updates) {
+        if (updates == null) return;
+        JSONObject app = updates.optJSONObject("app");
+        if (app == null) return;
+
+        String version = app.optString("version", "");
+        String url = app.optString("url", "");
+        boolean enabled = app.optBoolean("enabled", false);
+        boolean forced = app.optBoolean("forced", true);
+        String changelog = app.optString("changelog", "");
+
+        if (!enabled || url.length() == 0 || version.length() == 0 || version.equals(APP_VERSION)) return;
+
+        String message = "Version " + version + " is now available. You are on " + APP_VERSION + "."
+                + (changelog.length() > 0 ? "\n\n" + changelog : "");
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this)
+                .setTitle("Update available")
+                .setMessage(message)
+                .setPositiveButton("Update now", (d, w) -> startAppUpdate(url));
+        if (!forced) {
+            builder.setNegativeButton("Later", null);
+        }
+
+        AlertDialog dialog = builder.create();
+        dialog.setCancelable(!forced);
+        dialog.setOnCancelListener(l -> {
+            if (forced) {
+                try {
+                    if (isFinishing() || isDestroyed()) return;
+                    dialog.show();
+                } catch (Exception ignored) {}
+            }
+        });
+        try {
+            dialog.show();
+        } catch (Exception ignored) {}
+    }
+
+    private File getApkDest() {
+        File base = getExternalFilesDir("updates");
+        if (base == null) base = getFilesDir();
+        return new File(base, "viper-update.apk");
+    }
+
+    private void startAppUpdate(String url) {
+        pendingApkUrl = url;
+        showUpdateProgress("Preparing download…");
+        AppUpdater.download(url, getApkDest(),
+                percent -> {
+                    if (updateDialog != null && updateDialog.isShowing()) {
+                        updateProgress.setIndeterminate(false);
+                        updateProgress.setMax(100);
+                        updateProgress.setProgress(percent);
+                        updateProgressText.setText("Downloading update " + percent + "%");
+                    }
+                },
+                (ok, msg) -> runOnUiThread(() -> {
+                    dismissUpdateProgress();
+                    if (ok) {
+                        requestInstallPermission(getApkDest());
+                    } else {
+                        showUpdateError(msg != null ? msg : "Download failed");
+                    }
+                }));
+    }
+
+    private void requestInstallPermission(File apk) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && !getPackageManager().canRequestPackageInstalls()) {
+            pendingApkFile = apk;
+            try {
+                Intent intent = new Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES,
+                        Uri.parse("package:" + getPackageName()));
+                startActivityForResult(intent, REQUEST_INSTALL_UPDATE_PERMISSION);
+            } catch (Exception e) {
+                showUpdateError("Could not open install permission settings: " + e.getMessage());
+            }
+            return;
+        }
+        installApk(apk);
+    }
+
+    private void installApk(File apk) {
+        try {
+            Uri uri = FileProvider.getUriForFile(this, getPackageName() + ".fileprovider", apk);
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+            intent.setDataAndType(uri, "application/vnd.android.package-archive");
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(intent);
+        } catch (Exception e) {
+            showUpdateError("Install failed: " + e.getMessage());
+        }
+    }
+
+    private void showUpdateProgress(String label) {
+        if (updateDialog == null) {
+            updateDialog = new Dialog(this);
+            updateDialog.setContentView(R.layout.ios_loading);
+            updateDialog.setCancelable(false);
+            if (updateDialog.getWindow() != null) {
+                updateDialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+            }
+        }
+        TextView loadingText = updateDialog.findViewById(R.id.loadingText);
+        updateProgress = updateDialog.findViewById(R.id.progressBar);
+        updateProgressText = updateDialog.findViewById(R.id.progressText);
+        Button okButton = updateDialog.findViewById(R.id.okButton);
+        if (loadingText != null) loadingText.setText(label);
+        if (updateProgress != null) {
+            updateProgress.setIndeterminate(true);
+            updateProgress.setProgress(0);
+            updateProgress.setVisibility(View.VISIBLE);
+        }
+        if (updateProgressText != null) updateProgressText.setText("Please wait…");
+        if (okButton != null) okButton.setVisibility(View.GONE);
+        try {
+            if (!updateDialog.isShowing()) updateDialog.show();
+        } catch (Exception ignored) {}
+    }
+
+    private void dismissUpdateProgress() {
+        if (updateDialog != null && updateDialog.isShowing()) {
+            try { updateDialog.dismiss(); } catch (Exception ignored) {}
+        }
+    }
+
+    private void showUpdateError(String message) {
+        try {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this)
+                    .setTitle("Update failed")
+                    .setMessage((message != null ? message : "Unknown error") + "\n\nCheck your connection and try again.")
+                    .setNegativeButton("Close", null);
+            if (pendingApkUrl != null) {
+                builder.setPositiveButton("Retry", (d, w) -> startAppUpdate(pendingApkUrl));
+                builder.setOnCancelListener(l -> {
+                    if (pendingApkUrl != null) startAppUpdate(pendingApkUrl);
+                });
+            }
+            AlertDialog dialog = builder.create();
+            dialog.setCancelable(pendingApkUrl == null);
+            dialog.show();
+            if (pendingApkUrl != null) dialog.setCanceledOnTouchOutside(false);
+        } catch (Exception ignored) {}
     }
 
     private void renderAnnouncements(JSONArray announcements) {
@@ -283,6 +448,13 @@ public class LogAct extends AppCompatActivity {
                 // instead of killing the process (which looked like a crash).
                 recreate();
             }
+        } else if (requestCode == REQUEST_INSTALL_UPDATE_PERMISSION) {
+            boolean allowed = Build.VERSION.SDK_INT < Build.VERSION_CODES.O || getPackageManager().canRequestPackageInstalls();
+            if (allowed && pendingApkFile != null) {
+                installApk(pendingApkFile);
+            } else {
+                showUpdateError("Install from unknown sources is required to continue the update.");
+            }
         }
     }
 
@@ -335,7 +507,7 @@ public class LogAct extends AppCompatActivity {
         });
 
         new Thread(() -> {
-            String result = Check(m_Context, userKey); // native
+            String result = Check(m_Context, userKey, APP_VERSION); // native
             if ("OK".equals(result)) {
                 loginHandler.sendEmptyMessage(0);
                 
@@ -430,7 +602,7 @@ public class LogAct extends AppCompatActivity {
     }
 
     // --- Natives
-    private static native String Check(Context mContext, String userKey);
+    private static native String Check(Context mContext, String userKey, String appVersion);
     private native String GetKey();
     private native String GetServerStatus();
 

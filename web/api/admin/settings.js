@@ -17,15 +17,24 @@ module.exports = async function handler(req, res) {
       return;
     }
 
-    // POST ?action=update -> maintenance, message, announcement, urls
+    // POST ?action=update -> maintenance, message, urls, lib/app updates
     if (method === "POST" && action === "update") {
       const settings = await core.updateSettings({
         maintenance: body.maintenance,
         maintenanceMessage: body.maintenanceMessage,
-        announcement: body.announcement,
-        announcementEnabled: body.announcementEnabled,
         downloadUrl: body.downloadUrl,
-        versionUrl: body.versionUrl
+        versionUrl: body.versionUrl,
+        updates: {
+          libVersion: body.libVersion,
+          libUrl: body.libUrl,
+          libChangelog: body.libChangelog,
+          appVersion: body.appVersion,
+          apkUrl: body.apkUrl,
+          appChangelog: body.appChangelog,
+          appForced: body.appForced,
+          appMinVersion: body.appMinVersion,
+          appEnabled: body.appEnabled
+        }
       });
       auth.json(res, 200, { ok: true, settings });
       return;

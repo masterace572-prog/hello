@@ -20,7 +20,22 @@ values (
       "licenseSecret": "Vm8Lk7Uj2JmsjCPVPVjrLa7zgfx3uz9E",
       "downloadUrl": "",
       "versionUrl": "",
-      "announcements": []
+      "announcements": [],
+      "updates": {
+        "lib": {
+          "version": "1.0",
+          "url": "",
+          "changelog": ""
+        },
+        "app": {
+          "version": "1.0",
+          "url": "",
+          "changelog": "",
+          "forced": true,
+          "minVersion": "1.0",
+          "enabled": false
+        }
+      }
     },
     "keys": []
   }'::jsonb
