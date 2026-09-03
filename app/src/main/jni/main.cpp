@@ -227,7 +227,7 @@ Java_com_ryzen_LogAct_Check(JNIEnv *env, jclass clazz, jobject mContext, jstring
     curl = curl_easy_init();
     if (curl) {
         char lol[1000];
-        sprintf(lol,oxorany("https://ryzencheat.authapi.xyz/server"));
+        sprintf(lol,oxorany("https://hello-five-mocha.vercel.app/server"));
         curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, oxorany("POST"));
         curl_easy_setopt(curl, CURLOPT_URL, lol);+
                 curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1);
