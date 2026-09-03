@@ -1,5 +1,0 @@
-
-rootProject.name = "A15ZBox"
-include ':app'
-
-
