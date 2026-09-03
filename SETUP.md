@@ -215,9 +215,20 @@ Admin panel (web/public) ──▶ /api/admin/* (cookie session)
 | Create keys / duration / device limit | ✅ | ✅ enforced at login |
 | Device (HWID) binding | ✅ view + reset | ✅ auto-binds on login |
 | Disable / delete / bulk delete expired | ✅ | ✅ enforced at login |
-| Maintenance mode | ✅ toggle + message | ⚠️ shows as "Login failed: <message>" (not pretty yet) |
-| Announcements | ✅ create/toggle/delete | ❌ not shown in app yet |
+| Maintenance mode | ✅ toggle + message | ✅ full-screen "Under maintenance" overlay with your message + Check again |
+| Announcements | ✅ create/toggle/delete | ✅ latest two shown on the login screen |
 | Download / version URLs | ✅ configure | ⚠️ app uses hardcoded URLs (needs rebuild) |
+
+### How the app gets maintenance + announcements
+
+On launch the app calls `GET /api/status` (native `GetServerStatus()` in
+`app/src/main/jni/main.cpp`). It then:
+- Shows the full-screen maintenance overlay when maintenance is ON
+- Shows the latest two announcements on the login screen
+- Falls back silently to the normal login when the server is offline
+
+Both the `/server` and `/api/status` URLs are marked in one block at the
+top of `app/src/main/jni/main.cpp` — change them together.
 
 ---
 
