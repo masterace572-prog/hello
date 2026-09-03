@@ -422,6 +422,14 @@ tr:hover td { background: rgba(255, 255, 255, 0.015); }
 .toast.err { border-color: rgba(229, 72, 77, 0.5); color: #ff9b9e; }
 .toast.ok { border-color: rgba(76, 191, 135, 0.5); }
 
+.updates-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  align-items: start;
+}
+.updates-grid .card + .card { margin-top: 0; }
+
 .error-text { color: var(--danger); font-size: 13px; margin: 12px 0 0; }
 
 .notice {
@@ -461,4 +469,5 @@ tr:hover td { background: rgba(255, 255, 255, 0.015); }
   #storage-badge { display: none; }
   .content { padding: 20px 16px 40px; }
   .form-grid { grid-template-columns: 1fr; }
+  .updates-grid { grid-template-columns: 1fr; }
 }

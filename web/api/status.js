@@ -1,13 +1,14 @@
 "use strict";
 
 /**
- * Public status endpoint: maintenance flag, message and enabled
- * announcements. Useful for future in-app display; maintenance state
- * is also enforced directly inside /server during activation.
+ * Public status endpoint: maintenance flag, message, enabled
+ * announcements and the current update configuration (lib zip + app apk).
+ * The Android client reads this on launch.
  */
 
 const store = require("./_lib/store");
 const auth = require("./_lib/auth");
+const core = require("./_lib/core");
 
 module.exports = async function handler(req, res) {
   if (req.method !== "GET") {
@@ -15,16 +16,21 @@ module.exports = async function handler(req, res) {
     return;
   }
 
-  const db = await store.read();
-  const s = db.settings || {};
-  const announcements = (s.announcements || [])
-    .filter((a) => a.enabled)
-    .map((a) => ({ id: a.id, title: a.title, body: a.body, createdAt: a.createdAt }));
+  try {
+    const db = await store.read();
+    const s = core.effectiveSettings(db.settings || {});
+    const announcements = s.announcements
+      .filter((a) => a.enabled)
+      .map((a) => ({ id: a.id, title: a.title, body: a.body, createdAt: a.createdAt }));
 
-  auth.json(res, 200, {
-    ok: true,
-    maintenance: Boolean(s.maintenance),
-    maintenanceMessage: s.maintenanceMessage || "",
-    announcements
-  });
+    auth.json(res, 200, {
+      ok: true,
+      maintenance: s.maintenance,
+      maintenanceMessage: s.maintenanceMessage,
+      announcements,
+      updates: s.updates
+    });
+  } catch (err) {
+    auth.json(res, 500, { ok: false, error: "Status unavailable", reason: err.message });
+  }
 };

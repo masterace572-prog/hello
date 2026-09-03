@@ -34,7 +34,8 @@ module.exports = async function handler(req, res) {
   const result = await core.activate({
     userKey: body.user_key,
     serial: body.serial,
-    tz: body.tz
+    tz: body.tz,
+    appVersion: body.app_version
   });
 
   auth.json(res, 200, result);

@@ -171,7 +171,7 @@ $("#logout-btn").addEventListener("click", async () => {
 /* Navigation                                                          */
 /* ------------------------------------------------------------------ */
 
-const TITLES = { overview: "Overview", keys: "Keys", announcements: "Announcements", settings: "Settings" };
+const TITLES = { overview: "Overview", keys: "Keys", announcements: "Announcements", updates: "Updates", settings: "Settings" };
 let currentView = "overview";
 
 function navigate(view) {
@@ -179,7 +179,7 @@ function navigate(view) {
   $$(".nav-item").forEach((b) => b.classList.toggle("active", b.dataset.view === view));
   $("#page-title").textContent = TITLES[view] || "Admin";
   $("#page-actions").innerHTML = "";
-  const renders = { overview: renderOverview, keys: renderKeys, announcements: renderAnnouncements, settings: renderSettings };
+  const renders = { overview: renderOverview, keys: renderKeys, announcements: renderAnnouncements, updates: renderUpdates, settings: renderSettings };
   (renders[view] || renderOverview)();
 }
 
@@ -605,6 +605,177 @@ function announcementRow(a) {
       ])
     ])
   ]);
+}
+
+/* ------------------------------------------------------------------ */
+/* Updates (lib zip + app apk)                                         */
+/* ------------------------------------------------------------------ */
+
+async function uploadFile(file, type) {
+  if (!file) throw new Error("Choose a file first");
+  if (file.size > 4 * 1024 * 1024) {
+    throw new Error("File is larger than 4 MB. Upload it in the Supabase dashboard (Storage) and paste the public URL here.");
+  }
+  const res = await fetch("/api/admin/upload", {
+    method: "POST",
+    credentials: "same-origin",
+    headers: { "x-file-name": encodeURIComponent(file.name), "x-type": type, "Content-Type": "application/octet-stream" },
+    body: file
+  });
+  const data = await res.json().catch(() => null);
+  if (!res.ok || !data || !data.ok) {
+    throw new Error((data && (data.error || data.reason)) || "Upload failed");
+  }
+  return data.url;
+}
+
+async function renderUpdates() {
+  const content = $("#page-content");
+  content.innerHTML = '<div class="empty">Loading...</div>';
+  const { settings } = await api("/api/admin/settings?action=get");
+  const up = settings.updates || { lib: {}, app: {} };
+  const lib = up.lib || {};
+  const app = up.app || {};
+
+  const storageAvailable = session.storageMode === "supabase";
+  const storageNote = storageAvailable
+    ? "Files are uploaded to Supabase Storage (bucket: viper-updates). Files above 4 MB: upload in Supabase dashboard and paste the public URL."
+    : "Supabase is not connected — paste a public URL instead. Upload works once SUPABASE_URL + service role key are set.";
+
+  /* ---- Lib update card ---- */
+  const libVersion = el("input", { class: "input", value: lib.version || "1.0", placeholder: "1.0" });
+  const libUrl = el("input", { class: "input mono", value: lib.url || "", placeholder: "https://.../lib-....zip" });
+  const libChangelog = el("textarea", { class: "textarea", placeholder: "What changed in this build", value: lib.changelog || "" });
+  const libFile = el("input", { type: "file", accept: ".zip" });
+
+  const libCard = el("div", { class: "card" }, [
+    el("h3", { text: "Library update (zip)" }),
+    el("p", { class: "card-sub", text: "The app checks this version on login. If it changed, the zip is downloaded and extracted (libbgmi.so)." }),
+    el("div", { class: "form-grid" }, [
+      el("div", { class: "field" }, [el("span", { text: "Version" }), libVersion]),
+      el("div", { class: "field" }, [
+        el("span", { text: "Upload zip (≤ 4 MB)" }),
+        el("div", { style: "display:flex; gap:8px" }, [
+          libFile,
+          el("button", {
+            class: "btn btn-sm", text: "Upload",
+            onclick: async (e) => {
+              e.target.disabled = true;
+              try {
+                const url = await uploadFile(libFile.files[0], "lib");
+                libUrl.value = url;
+                toast("Uploaded to Supabase Storage", "ok");
+                libFile.value = "";
+              } catch (err) {
+                toast(err.message, "err");
+              } finally {
+                e.target.disabled = false;
+              }
+            }
+          })
+        ])
+      ])
+    ]),
+    el("div", { class: "field" }, [el("span", { text: "Download URL (auto-filled after upload)" }), libUrl]),
+    el("div", { class: "field" }, [el("span", { text: "Changelog" }), libChangelog]),
+    el("p", { class: "card-sub", text: storageNote }),
+    el("button", {
+      class: "btn btn-primary", text: "Save lib update",
+      onclick: async (e) => {
+        e.target.disabled = true;
+        try {
+          await api("/api/admin/settings?action=update", {
+            method: "POST",
+            body: { libVersion: libVersion.value.trim(), libUrl: libUrl.value.trim(), libChangelog: libChangelog.value }
+          });
+          toast("Lib update saved", "ok");
+          renderUpdates();
+        } catch (err) {
+          toast(err.message, "err");
+          e.target.disabled = false;
+        }
+      }
+    })
+  ]);
+
+  /* ---- App update card ---- */
+  const appVersion = el("input", { class: "input", value: app.version || "1.0", placeholder: "1.0" });
+  const appMinVersion = el("input", { class: "input", value: app.minVersion || "1.0", placeholder: "1.0" });
+  const apkUrl = el("input", { class: "input mono", value: app.url || "", placeholder: "https://.../app-....apk" });
+  const appChangelog = el("textarea", { class: "textarea", placeholder: "What changed in this release", value: app.changelog || "" });
+  const appFile = el("input", { type: "file", accept: ".apk" });
+  const appEnabled = el("input", { type: "checkbox", checked: app.enabled ? "" : null });
+  const appForced = el("input", { type: "checkbox", checked: app.forced === undefined ? true : app.forced ? "" : null });
+
+  const appCard = el("div", { class: "card" }, [
+    el("h3", { text: "App update (APK)" }),
+    el("p", { class: "card-sub", text: "Push a new APK. Clients below the minimum version are blocked from login until they update (old APK shuts down)." }),
+    el("div", { class: "form-grid" }, [
+      el("div", { class: "field" }, [el("span", { text: "New version" }), appVersion]),
+      el("div", { class: "field" }, [el("span", { text: "Minimum allowed version" }), appMinVersion])
+    ]),
+    el("div", { class: "field" }, [
+      el("span", { text: "Upload APK (≤ 4 MB)" }),
+      el("div", { style: "display:flex; gap:8px" }, [
+        appFile,
+        el("button", {
+          class: "btn btn-sm", text: "Upload",
+          onclick: async (e) => {
+            e.target.disabled = true;
+            try {
+              const url = await uploadFile(appFile.files[0], "app");
+              apkUrl.value = url;
+              toast("Uploaded to Supabase Storage", "ok");
+              appFile.value = "";
+            } catch (err) {
+              toast(err.message, "err");
+            } finally {
+              e.target.disabled = false;
+            }
+          }
+        })
+      ])
+    ]),
+    el("div", { class: "field" }, [el("span", { text: "APK URL (auto-filled after upload)" }), apkUrl]),
+    el("div", { class: "field" }, [el("span", { text: "Changelog" }), appChangelog]),
+    el("div", { class: "field inline" }, [
+      el("div", { class: "switch" }, [appEnabled, el("span", { class: "track" })]),
+      el("span", { text: "Update available (push to clients)" })
+    ]),
+    el("div", { class: "field inline" }, [
+      el("div", { class: "switch" }, [appForced, el("span", { class: "track" })]),
+      el("span", { text: "Forced update (cannot skip or cancel)" })
+    ]),
+    el("button", {
+      class: "btn btn-primary", text: "Push app update",
+      onclick: async (e) => {
+        e.target.disabled = true;
+        try {
+          await api("/api/admin/settings?action=update", {
+            method: "POST",
+            body: {
+              appVersion: appVersion.value.trim(),
+              appMinVersion: appMinVersion.value.trim(),
+              apkUrl: apkUrl.value.trim(),
+              appChangelog: appChangelog.value,
+              appEnabled: appEnabled.checked,
+              appForced: appForced.checked
+            }
+          });
+          toast(appEnabled.checked ? "App update pushed" : "App update saved (disabled)", "ok");
+          renderUpdates();
+        } catch (err) {
+          toast(err.message, "err");
+          e.target.disabled = false;
+        }
+      }
+    })
+  ]);
+
+  content.innerHTML = "";
+  content.append(
+    el("div", { class: "updates-grid" }, [libCard, appCard])
+  );
 }
 
 /* ------------------------------------------------------------------ */

@@ -146,20 +146,16 @@ grant all on table public.viper_data to service_role;
 
 ## Part 7 — Point the Android app to this server
 
-The endpoint is hardcoded in the native source:
-`app/src/main/jni/main.cpp` (around line 193):
+Already configured for this deployment: `main.cpp` points to
+`https://hello-five-mocha.vercel.app` for:
 
-```cpp
-sprintf(lol, oxorany("https://ryzencheat.authapi.xyz/server"));
-```
+- `/server` (login)
+- `/api/status` (maintenance + announcements + updates)
+- `/api/lib/version` + `/api/lib/file` (zip updates)
 
-Change to your server URL:
-
-```cpp
-sprintf(lol, oxorany("https://YOUR-PROJECT.vercel.app/server"));
-```
-
-Then commit — the GitHub Actions workflow auto-builds a new APK:
+If your URL changes, edit the **SERVER CONFIGURATION** block at the top
+of `app/src/main/jni/main.cpp` and rebuild. Then commit — the GitHub
+Actions workflow auto-builds a new APK:
 
 1. GitHub → **Actions** → **Android Build** → latest run
 2. Wait for green
@@ -168,28 +164,47 @@ Then commit — the GitHub Actions workflow auto-builds a new APK:
 
 ---
 
-## Part 8 — Optional: host the game package on Vercel too
+## Part 8 — Library (zip) updates — managed in the admin panel
 
-The app downloads a package (`DIE.zip`) from a URL hardcoded in
-`app/src/main/jni/main.cpp`:
+The app now reads the lib version and zip URL **from the server DB**
+(admin panel → **Updates**), not from hardcoded GitHub URLs.
 
-```cpp
-// version file
-const char *versionUrl = (oxorany("https://github.com/AkhilRyzen/Ryzen/releases/download/Ryzen/version.txt"));
-// package
-const char *downloadUrl = (oxorany("https://github.com/AkhilRyzen/Ryzen/releases/download/Ryzen/hb.zip"));
-```
+**To push a new lib build:**
+1. Admin panel → **Updates** → Library update card
+2. Upload the zip (≤ 4 MB via panel; for larger: Supabase dashboard →
+   Storage → bucket `viper-updates` → upload → copy public URL)
+3. Paste/confirm download URL
+4. Set **Version** (e.g. `1.1`) — any change triggers re-download
+5. Add changelog → **Save lib update**
 
-To host on Vercel:
-1. Put `DIE.zip` into `web/public/files/`
-2. Update `version.txt` in `web/public/files/` to match the package version
-3. Point the app to:
-   ```
-   https://YOUR-PROJECT.vercel.app/files/version.txt
-   https://YOUR-PROJECT.vercel.app/files/DIE.zip
-   ```
+The app downloads the zip only when the version changes; otherwise it
+reuses the extracted `libbgmi.so`. Same behavior as the old
+`version.txt` + `hb.zip` flow, now controlled from the DB.
 
-The app only re-downloads when the version string changes.
+## Part 9 — App (APK) updates — forced updates
+
+The app can update itself in-app when you push a new APK.
+
+**To publish an app update:**
+1. Bump `APP_VERSION` in `app/src/main/jni/main.cpp` (and the same value
+   in `LogAct.java`) — e.g. `"1.1"`. Commit → Actions builds new APK.
+2. Admin panel → **Updates** → App update card
+3. Upload APK (or paste public URL from Supabase Storage)
+4. Set **New version** (matches the APK) and **Minimum allowed version**
+5. Changelog → enable **Update available** → **Push app update**
+
+**Behavior on clients:**
+- App checks for updates on every launch via `/api/status`
+- Update available → "Update available" dialog with changelog
+- **Forced** → cannot skip or cancel; only "Update now"
+- Downloads inside the app with progress, requests "install unknown
+  apps" permission, installs with the same keystore (app upgrades
+  cleanly, data preserved)
+- Old APKs below the **minimum version** are rejected at login by the
+  server (`Update required`) — old builds stop working
+
+> The APK must be signed with the same keystore (`app/zen.jks`, already
+> used by the build) so it installs over the previous version.
 
 ---
 
@@ -217,7 +232,8 @@ Admin panel (web/public) ──▶ /api/admin/* (cookie session)
 | Disable / delete / bulk delete expired | ✅ | ✅ enforced at login |
 | Maintenance mode | ✅ toggle + message | ✅ full-screen "Under maintenance" overlay with your message + Check again |
 | Announcements | ✅ create/toggle/delete | ✅ latest two shown on the login screen |
-| Download / version URLs | ✅ configure | ⚠️ app uses hardcoded URLs (needs rebuild) |
+| **Lib (zip) updates** | ✅ upload/URL + version + changelog | ✅ checks server version, downloads only when changed |
+| **App (APK) updates** | ✅ upload/URL + version + min version + forced | ✅ in-app download with progress + clean install over old; old versions blocked |
 
 ### How the app gets maintenance + announcements
 
