@@ -96,7 +96,7 @@ public class LogAct extends AppCompatActivity {
 
         prefs = new Prefs(this);
 
-        // 🔑 Check permissions
+        // Check permissions
         checkAndRequestPermissions();
 
         textUsername = findViewById(R.id.userkey);
@@ -155,7 +155,7 @@ public class LogAct extends AppCompatActivity {
    
 
 
-    // 🔧 Permissions handling
+    // Permissions handling
     private void checkAndRequestPermissions() {
         android.content.SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
         boolean permissionsGranted = prefs.getBoolean(PREF_PERMISSIONS_GRANTED, false);
@@ -242,7 +242,7 @@ public class LogAct extends AppCompatActivity {
         return false;
     }
 
-    // 🔑 Login
+    // Login
     private void Login(final Context m_Context, final String userKey) {
         showLoadingDialog("Checking key...", false);
 
@@ -316,7 +316,7 @@ public class LogAct extends AppCompatActivity {
         return dialog;
     }
 
-    // 🔧 Dialog (main)
+    // Dialog (main)
     private void showLoadingDialog(String message, boolean isError) {
         if (loadingDialog == null) {
             loadingDialog = new Dialog(this);

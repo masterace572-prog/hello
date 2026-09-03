@@ -86,7 +86,7 @@ public class MAct extends AppCompatActivity {
 
         // BGMI START
         startButton = findViewById(R.id.startBgmi);
-        startButton.setText("LAUNCH");
+        startButton.setText("Launch");
         // One tap: install into the virtual container if needed, prepare OBB,
         // then launch the game. No intermediate options dialog is required.
         startButton.setOnClickListener(v -> handleLaunchFlow());
@@ -141,7 +141,7 @@ public class MAct extends AppCompatActivity {
         if (isCopyingObb || isLaunching) return;
         if (startButton != null) {
             startButton.setEnabled(false);
-            startButton.setText("STARTING...");
+            startButton.setText("Starting...");
         }
         try {
             if (!BlackBoxCore.get().isInstalled(PKG_BGMI, USER_ID)) {
@@ -171,7 +171,7 @@ public class MAct extends AppCompatActivity {
     private void resetStartButton() {
         if (startButton != null) {
             startButton.setEnabled(true);
-            startButton.setText("LAUNCH");
+            startButton.setText("Launch");
         }
     }
 

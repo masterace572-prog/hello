@@ -1,29 +1,49 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="primary">#FF6A1A</color>
-    <color name="primaryVariant">#C83B08</color>
-    <color name="secondary">#8AF7FF</color>
-    <color name="accent">#FFB35C</color>
-    <color name="bg_dark">#070A10</color>
-    <color name="card_dark">#111722</color>
-    <color name="card_stroke">#5B6675</color>
-    <color name="input_bg">#0A0F17</color>
-    <color name="error">#FF5C64</color>
-    <color name="success">#8AF7FF</color>
-    <color name="text_primary">#F3F7FA</color>
-    <color name="text_secondary">#B7C2CC</color>
-    <color name="text_muted">#7E8B98</color>
-    <color name="button">#FF6A1A</color>
-    <color name="buttonPrimary">#8AF7FF</color>
-    <color name="primaryText">#F3F7FA</color>
-    <color name="hintText">#7E8B98</color>
-    <color name="darker_gray">#52606D</color>
-    <color name="background">#070A10</color>
-    <color name="background2">#111722</color>
-    <color name="black">#030405</color>
+    <!-- Accent -->
+    <color name="primary">#3D7EFF</color>
+    <color name="primaryVariant">#2E63D4</color>
+    <color name="secondary">#3D7EFF</color>
+    <color name="accent">#3D7EFF</color>
+    <color name="on_accent">#FFFFFF</color>
+
+    <!-- Surfaces -->
+    <color name="bg_dark">#0B0E13</color>
+    <color name="background">#0B0E13</color>
+    <color name="background2">#131820</color>
+    <color name="card_dark">#131820</color>
+    <color name="surface">#131820</color>
+    <color name="surface_alt">#1A202A</color>
+    <color name="surface_elevated">#1E2530</color>
+    <color name="input_bg">#10151C</color>
+
+    <!-- Borders & lines -->
+    <color name="card_stroke">#242D38</color>
+    <color name="border">#242D38</color>
+    <color name="border_strong">#2E3946</color>
+    <color name="darker_gray">#3A4552</color>
+
+    <!-- Text -->
+    <color name="text_primary">#F3F5F8</color>
+    <color name="secondary2">#1A202A</color>
+    <color name="primaryText">#F3F5F8</color>
+    <color name="text_secondary">#A8B1BC</color>
+    <color name="text_muted">#67717D</color>
+    <color name="hintText">#67717D</color>
+
+    <!-- Semantic -->
+    <color name="success">#33C481</color>
+    <color name="success_soft">#132A20</color>
+    <color name="success_border">#2A5A43</color>
+    <color name="error">#E5484D</color>
+    <color name="error_soft">#2A1518</color>
+
+    <!-- Legacy compatibility (kept for existing references) -->
+    <color name="button">#3D7EFF</color>
+    <color name="buttonPrimary">#3D7EFF</color>
+    <color name="colorAccent">#3D7EFF</color>
+    <color name="surfaceElevated">#1A202A</color>
+    <color name="borderBright">#3D7EFF</color>
+    <color name="black">#05070A</color>
     <color name="white">#FFFFFF</color>
-    <color name="colorAccent">#8AF7FF</color>
-    <color name="secondary2">#1A222D</color>
-    <color name="surfaceElevated">#1A222D</color>
-    <color name="borderBright">#FF6A1A</color>
 </resources>

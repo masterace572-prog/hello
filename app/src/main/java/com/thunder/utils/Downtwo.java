@@ -27,14 +27,14 @@ public class Downtwo extends AsyncTask<String, String, String> {
         void onComplete(boolean success);
     }
 
-    // 🔹 NEW: Progress listener for % updates
+    // Progress listener for percent updates
     public interface ProgressListener {
         void onProgress(int percent);
     }
 
     private final Context context;
     private final Callback callback; // may be null
-    private ProgressListener progressListener; // 🔹 Added
+    private ProgressListener progressListener;
     private androidx.appcompat.app.AlertDialog progressDialog;
     private String serverVersion = "0.0";
     private static final String PREF_NAME = "com.ryzen.download";
@@ -53,7 +53,7 @@ public class Downtwo extends AsyncTask<String, String, String> {
         this.callback = callback;
     }
 
-    // 🔹 Setter for progress listener
+    // Setter for progress listener
     public void setProgressListener(ProgressListener listener) {
         this.progressListener = listener;
     }
