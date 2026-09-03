@@ -453,9 +453,9 @@ tr:last-child td { border-bottom: none; }
 tr:hover td { background: rgba(255, 255, 255, 0.01); }
 
 /* Key cell */
-.key-cell { display: flex; align-items: center; gap: 6px; }
+.key-cell { display: flex; align-items: center; gap: 8px; min-width: 200px; }
 
-.key-text { font-family: var(--font-mono); font-size: 12px; color: var(--text); white-space: nowrap; }
+.key-text { font-family: var(--font-mono); font-size: 13px; color: var(--text); white-space: nowrap; padding: 6px 8px; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--surface-2); }
 
 .key-text.copied { color: var(--success); }
 
@@ -610,7 +610,7 @@ tr:hover td { background: rgba(255, 255, 255, 0.01); }
   
   .nav { flex-direction: row; gap: 4px; }
   
-  .nav-item { padding: 8px 10px; font-size: 12px; }
+  .nav-item { padding: 12px 16px; font-size: 14px; }
   
   .sidebar-footer { margin-left: auto; flex-direction: row; align-items: center; }
   
@@ -629,13 +629,27 @@ tr:hover td { background: rgba(255, 255, 255, 0.01); }
   .field.inline > span { margin-bottom: 4px; text-align: left; }
   
   /* Mobile: full-width buttons */
-  .btn-block { width: 100%; }
+  .btn-block { width: 100%; padding: 12px; font-size: 14px; }
   
   /* Mobile: table scroll */
   .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
   
   /* Mobile: hide non-essential badges */
-  .badge { font-size: 10px; padding: 2px 5px; }
+  .badge { font-size: 11px; padding: 3px 6px; }
+  
+  /* Mobile: improved tap targets */
+  .key-cell { gap: 8px; }
+  .key-text { font-size: 14px; padding: 8px; }
+  
+  /* Ensure minimum tap target size 48px */
+  .nav-item,
+  .btn,
+  .icon-btn,
+  .filter-chip,
+  .toggle-switch { min-height: 44px; min-width: 44px; }
+  
+  .switch .track { height: 28px; }
+  .switch .track::after { top: 4px; left: 4px; width: 20px; height: 20px; }
 }
 
 /* ============ EMPTY STATE ============ */
